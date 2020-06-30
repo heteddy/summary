@@ -6,11 +6,59 @@
 
 
 
-## mmap
+## 选项
+
+`void* mmap(void* addr, size_t len, int prot, int flag, int fd, off_t off)`
 
 MAP_SHARED //与其它所有映射这个对象的进程共享映射空间。对共享区的写入，相当于输出到文件。直到msync()或者[munmap](https://baike.baidu.com/item/munmap)()被调用，文件实际上不会被更新。
 
 MAP_PRIVATE //建立一个写入时拷贝的私有映射。内存区域的写入不会影响到原文件。这个标志和以上标志是互斥的，只能使用其中一个。
+
+## mmap内存映射原理
+
+mmap是一种内存映射文件的方法，即将一个文件或者其他对象映射到进程的地址空间，实现文件磁盘地址和进程虚拟地址空间中一段虚拟地址的一一对应关系；实现这样的映射关系后，进程就可以采用指针的方式读写操作这一块内存，而系统会自动回写脏页面到对应的文件磁盘上，即完成了对文件的操作而不必调用read，write等系统调用函数，相反，内核空间堆这段区域的修改也直接反应到用户空间，从而可以实现不同进程间的文件共享。
+
+![1492538-65c592785f5e64a4.png](https://upload-images.jianshu.io/upload_images/9243349-b0c558e9f551b0fc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- 进程的虚拟地址空间，由多个虚拟内存区域构成。
+- 虚拟内存区域是进程的虚拟地址空间中的一个同质区间，即具有同样特性的连续地址范围。
+- text数据段，初始数据段，BSS数据段，堆，栈和内存映射都是一个独立的虚拟内存区域。
+- 为内存映射服务的地址空间处于堆栈之外的空余部分。
+
+**mmap内存映射的实现过程，可分为三个阶段**
+
+进程启动映射过程，并在虚拟地址空间中为映射创建虚拟映射区域
+
+- 进程在用户空间调用mmap函数
+- 在当前进程的虚拟地址空间中，寻找一段空闲的满足要求的连续的虚拟地址
+- 为此虚拟去分配一个vm_area_struct结构，并对该结构各个域进行初始化
+- 将新建的vm_area_struct插入到进程的虚拟地址区域链表或树中
+
+## vm_area_struct
+
+vm_area_struct ：虚拟内存管理的最基本单元，描述的是一段连续的，具有相同访问属性的虚拟空间，该空间的大小为物理内存页面的整数倍。
+
+linux内核实用 vm_area_struct 来表示一个独立的虚拟内存区域，由于每个不同质的虚拟内存区域功能和内部机制不同，因此一个进程实用多个vm_area_struct结构来分别表示不同类型的虚拟内存区域。各个vm_area_struct实用链表或者树形结构连接，方便进程快速访问。
+
+![1492538-0cdca89bda99d8b6.png](https://upload-images.jianshu.io/upload_images/9243349-a33307285a6d2491.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+**task_struct:**进程控制模块；
+**mm_struct：**进程所拥有的内存描述符；
+
+## 调用内核空间的系统调用函数mmap（不同于用户空间），实现文件的物理地址和进程的虚拟地址的一一映射关系。
+
+- 为映射分配了新的虚拟地址区域后，通过待映射的文件指针，在文件描述符表中找到对应的文件描述符，通过文件描述符，连接到内核“已打开文集”中该文件的文件结构体struct file，每个文件结构体维护着和这个已打开文件的相关信息。
+- 通过该文件的文件结构体，连接到file_operations模块，调用 内核函数mmap，int mmap(struct file *filep,struct vm_area_struct *vma)
+- 内核mmap函数通过虚拟文件系统inode模块定位到文件磁盘物理地址。
+- 通过remap_pfn_range函数建立页表，即实现了文件地址和虚拟地址区域的映射，此时这片虚拟地址区域没有任何数据关联到主存中
+
+## 进程发起对这片映射空间的访问，引发缺页异常，实现文件内容到物理内存的拷贝。
+
+- 进程的读写操作访问虚拟地址空间的这一段映射地址，通过查询页表，发现这一段地址不在物理页面上，因为只是建立了地址映射，真正的磁盘数据还没有拷贝到内存中，因此引发缺页异常
+- 缺页异常进行一系列判断，确定无非法操作后，内核发起请求调页过程
+- 调页过程先在交换缓存空间中寻找需要访问的内存页，如果没有则调用nopage函数把所缺的页面从磁盘装入主存中
+- 之后进程可对这片主存进行读或写操作，如果写操作改变了内容，一定时间后系统会自动回写脏页面到对应的磁盘地址，也就是完成了写入到文件的过程
+- 修改过的脏页面不会立即更新到文件中，而是有一段时间的延迟，可以调用msync来强制同步，这样所写的内容就立即保存到文件里了。
 
 ## mmap
 
@@ -290,10 +338,6 @@ struct writeback_control
 
 该结构可当做上面所描述回写任务的子任务，即系统会将每次回写任务拆分成多个子任务去处理，原因会在后面仔细说明。
 
-# buffer cache
-
-
-
 # 回写
 
 ## bdi(backing device info) 备用存储设备相关信息
@@ -461,19 +505,8 @@ fsync(int fd)(位于fs/sync.c中)
    block_write_end。<font color=red size=4>调用`__block_commit_write`为page中的每一个buffer_head结构设置dirty标记；
    至此，write调用就要返回了</font>。如果文件打开时使用了O_SYNC标记，sync_page_range或generic_osync_inode将被调用。否则write就结束了，等待pdflush内核线程发现radix树上的脏页，并最终调用到do_writepages写回这些脏页
 
-7. sdf
+   
 
-8. sdf
-
-9. asdf
-
-10. sdf
-
-11. sdf
-
-12. sdf
-
-13. 
 
 ![20200527200122956.png](https://upload-images.jianshu.io/upload_images/9243349-94d4526b31ba7fbc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
