@@ -2,6 +2,50 @@
 
 虚拟文件系统和文件系统簇以及`page cache`,`buffer cache`的关系；文件的通用块io，驱动程序，address_space。回写关系
 
+![浅谈Linux内核IO体系之磁盘IO](https://pic4.zhimg.com/v2-de12c1618e70b48e3285a43089924c9e_1440w.jpg?source=172ae18b)
+
+![Linux 的IO栈](https://pic1.zhimg.com/v2-f16ed2f85e36d75e157aed2d9b6d63bc_1440w.jpg?source=172ae18b)
+
+# write返回成功数据落盘了吗？
+
+Buffered IO：write返回数据仅仅是写入了PageCache，还没有落盘。
+
+Direct IO：write返回数据仅仅是到了通用块层放入IO队列，依旧没有落盘。
+
+此时设备断电、宕机仍然会发生数据丢失。需要调用fsync或者fdatasync把数据刷到磁盘上，调用命令时，磁盘本身缓存(DiskCache)的内容也会持久化到磁盘上。
+
+# write系统调用是原子的吗？
+
+write系统调用不是原子的，如果有多线程同时调用，数据可能会发生错乱。可以使用`O_APPEND`标志打开文件，只能追加写，这样多线程写入就不会发生数据错乱。
+
+# mmap相比read、write快在了哪里？
+
+mmap直接把PageCache映射到用户态，少了一次系统调用，也少了一次数据在用户态和内核态的拷贝。
+
+mmap通常和read搭配使用：写入使用write+sync，读取使用mmap。
+
+# 为什么Direct IO需要数据对齐？
+
+DIO跳过了PageCache，直接到通用块层，而通用块层的IO都必须是块大小对齐的，所以需要用户程序自行对齐offset、length。
+
+# Libaio的IO栈？
+
+```cpp
+write()--->sys_write()--->vfs_write()--->通用块层--->IO调度层--->块设备驱动层--->块设备
+```
+
+# 为什么需要 by pass pagecache？
+
+当应用程序不满Linux内核的Cache策略，有更适合自己的Cache策略时可以使用Direct IO跳过PageCache。例如Mysql。
+
+# 为什么需要 by pass kernel？
+
+当应用程序对延迟极度敏感时，由于Linux内核IO栈有7层，IO路径比较长，为了缩短IO路径，降低IO延迟，可以by pass kernel，直接使用用户态的块设备驱动程序。例如spdk的nvme，阿里云的ESSD。
+
+# 为什么需要直接操作裸设备？
+
+当应用程序仅仅使用了基本的read、write，用不到文件系统的大而全的功能，此时文件系统的开销对于应用程序来说是一种累赘，此时需要跳过文件系统，接管裸设备，自己实现磁盘分配、缓存等功能，通常使用DIO+Libaio+裸设备。例如Ceph FileStore的Journal、Ceph BlueStore。
+
 # 虚拟文件系统vfs
 
 ## 选项
@@ -563,9 +607,225 @@ mpage_writepages。检查radix树中需要写回的page，对每一个page调用
 
 [22.Linux-块设备驱动之框架详细分析(详解)](https://www.cnblogs.com/lifexy/p/7651667.html)
 
+以下为摘要
 
+**6.本节框架分析总结,****如下图所示:**
 
+ ![img](https://images2017.cnblogs.com/blog/1182576/201710/1182576-20171011170757902-1081317323.png)
 
+ 
+
+**7.其中q->request_fn是一个request_fn_proc结构体,如下图所示:**
+
+ ![img](https://images2017.cnblogs.com/blog/1182576/201710/1182576-20171011170856652-111215171.png)
+
+**7.1那这个申请队列**q->request_fn**又是怎么来的？**
+
+我们参考自带的块设备驱动程序drivers\block\xd.c
+
+在入口函数中发现有这么一句:
+
+```
+static struct request_queue *xd_queue;             //定义一个申请队列xd_queue
+
+xd_queue = blk_init_queue(do_xd_request, &xd_lock);       //分配一个申请队列
+```
+
+ 
+
+其中**blk_init_queue()**函数原型如下所示:
+
+```
+request_queue *blk_init_queue(request_fn_proc *rfn, spinlock_t *lock);
+//  *rfn: request_fn_proc结构体,用来执行申请队列中的处理函数
+//  *lock:队列访问权限的自旋锁(spinlock),该锁需要通过DEFINE_SPINLOCK()函数来定义
+```
+
+ 
+
+显然就是将do_xd_request()挂到xd_queue->request_fn里.然后返回这个request_queue队列
+
+ ***\*7.2我们再看看\*\*申请队列的处理函数\*\* do_xd_request()是如何处理的,函数如下：\****
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+```
+static void do_xd_request (request_queue_t * q)
+{
+  struct request *req;            
+
+  if (xdc_busy)
+      return;
+
+  while ((req = elv_next_request(q)) != NULL)    //(1)while获取申请队列中的需要处理的申请
+  {
+    int res = 0;
+    ... ...
+　　 for (retry = 0; (retry < XD_RETRIES) && !res; retry++)         
+        res = xd_readwrite(rw, disk, req->buffer, block, count);
+　　　　　　　　　　　　　　　　 //将获取申请req的buffer成员 读写到disk扇区中,当读写失败返回0,成功返回1
+
+　　 end_request(req, res);         //申请队列中的的申请已处理结束,当res=0,表示读写失败
+    }
+}
+```
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+ 
+
+**(1)****为什么要while****一直获取？**
+
+因为这个q是个申请队列,里面会有多个申请,之前是使用电梯算法elv_merge()函数合并的,所以获取也要通过电梯算法elv_next_request()函数获取.
+
+**通过上面代码和注释,****内核中的申请队列q****最终都是交给驱动处理,****由驱动来对扇区读写**
+
+ 
+
+**8.接下来我们就看看drivers\block\xd.c的入口函数大概流程,是如何创建块设备驱动的**
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+```
+static DEFINE_SPINLOCK(xd_lock);　　　  //定义一个自旋锁,用到申请队列中
+static struct request_queue *xd_queue; //定义一个申请队列xd_queue
+
+static int __init xd_init(void)          //入口函数
+{
+if (register_blkdev(XT_DISK_MAJOR, "xd"))  //1.创建一个块设备,保存在/proc/devices中
+            goto out1;
+
+xd_queue = blk_init_queue(do_xd_request, &xd_lock);  //2.分配一个申请队列,后面会赋给gendisk结构体的queue成员
+... ...
+
+for (i = 0; i < xd_drives; i++) {                   
+  ... ...
+  struct gendisk *disk = alloc_disk(64);  //3.分配一个gendisk结构体, 64:次设备号个数,也称为分区个数
+
+/*    4.接下来设置gendisk结构体        */
+  disk->major = XT_DISK_MAJOR;             //设置主设备号
+  disk->first_minor = i<<6;                //设置次设备号
+  disk->fops = &xd_fops;                   //设置块设备驱动的操作函数
+  disk->queue = xd_queue;                  //设置queue申请队列,用于管理该设备IO申请队列
+  ... ...
+
+  xd_gendisk[i] = disk;
+}
+
+ ... ...
+ for (i = 0; i < xd_drives; i++)
+  add_disk(xd_gendisk[i]);                                //5.注册gendisk结构体
+}
+```
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+ 
+
+其中gendisk(通用磁盘)结构体是用来存储该设备的硬盘信息，包括请求队列、分区链表和块设备操作函数集等,结构体如下所示:
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+```
+struct gendisk {
+  int major;              　　　　　　　　  /*设备主设备号*/
+  int first_minor;         　　　　　　　　 /*起始次设备号*/
+  int minors;            　　　　　　　　   /*次设备号的数量，也称为分区数量，如果改值为1，表示无法分区*/
+  char disk_name[32];    　　　　　　　　　 /*设备名称*/
+  struct hd_struct **part;  　　　　　　　　/*分区表的信息*/
+  int part_uevent_suppress;
+  struct block_device_operations *fops;  /*块设备操作集合 */
+  struct request_queue *queue;           /*申请队列，用于管理该设备IO申请队列的指针*/
+  void *private_data;                    /*私有数据*/
+  sector_t capacity;                     /*扇区数,512字节为1个扇区,描述设备容量*/
+  ....
+    };
+```
+
+[![复制代码](https://common.cnblogs.com/images/copycode.gif)](javascript:void(0);)
+
+ 
+
+**9.所以注册一个块设备驱动,需要以下步骤:**
+
+1. 创建一个块设备
+2. 分配一个申请队列
+3. 分配一个gendisk结构体
+4. 设置gendisk结构体的成员
+5. 注册gendisk结构体
+
+# [23.Linux-块设备驱动(详解)](https://www.cnblogs.com/lifexy/p/7661454.html)
 
 [块层介绍 第二篇: request层](https://mp.weixin.qq.com/s/5qHpq-NXbUEzp-m2tisJAw?scene=25#wechat_redirect)
+
+
+
+## 各层接口
+
+
+清晰的接口能让复杂的系统变得容易理解和维护。
+
+**应用程序 => 文件系统**
+
+
+做开发的人可能都应该了解，通过诸如open/read/pread/write/writev等POSIX接口来调用文件系统各种功能。由于其普遍性，在这里就不一一描述接口形式了。
+
+
+**文件系统 => 块设备层**
+
+
+这里我们将文件系统当成一个整体，并不区分VFS和具体文件系统。块设备层对文件系统提供的接口为*submit_bio*(*)*，接口形式如下：
+
+```c
+void submit_bio(int rw, struct bio *bio)
+```
+
+
+文件系统向块设备提交的每个bio请求都设置了完成回调函数，记录在*bio->***bi_end_io**。bio请求完成后，通过该字段通知文件系统。
+
+
+**块设备层 => SCSI上层**
+
+
+*scsi_reuqest_fn()和struct request_queue。
+*老实来说，块设备层和SCSI上层之间分的没有那么清楚，耦合的稍微紧密，块设备层看到的IO请求结构是*request*。而SCSI层看到的IO命令则是*scsi_cmnd*。
+
+每个scsi设备（如scsi disk）均维护了一个请求队列*request_queue*，而每个scsi设备对上层呈现的其实是一个块设备。因此，块设备和scsi设备有着天然的联系，request_queue则是连接块设备层和SCSI层的纽带。块设备层对request请求最终会派发至request_queue中。而在特定条件下通过泄流机制将request_queue中积攒的request派发至SCSI层处理。而泄流的实际处理过程就是*scsi_request_fn*()函数，因此说它是块设备层和SCSI上层的接口也不为过，虽然不是特别准确。在*scsi_reuqest_fn*内会进行request至scsi_cmnd的转换。
+
+**SCSI上层 => SCSI中间层**
+
+
+SCSI上层在收到块设备层发起的scsi命令后马不停蹄又将其转发至SCSI中间层。SCSI上层至SCSI中间层的接口是 *scsi_dispatch_cmd*
+
+```c
+static void scsi_request_fn(struct request_queue *q) {
+    ......
+    // 设置scsi命令完成回调函数
+    cmd->scsi_done = scsi_done;
+    rtn = scsi_dispatch_cmd(cmd);
+    ......
+}
+```
+
+
+**SCSI中间层 => SCSI低层**
+
+
+SCSI中间层收到块设备层发下来的scsi_cmnd命令后，中间层作自己处理后，然后再将该命令继续往下传递，接下来该命令到了scsi底层，而传递的接口是 *queuecommand()*
+
+```c
+static int scsi_dispatch_cmd(struct scsi_cmnd *cmd) {
+    ......
+    rtn = host->hostt->queuecommand(host, cmd);
+    ......
+}
+```
+
+
+host为该设备所属的主机适配器结构。任何一个SCSI主机适配器都需要实现*queuecommand*接口。注意这个提交过程是异步的，无需等待该命令完成便直接返回。
+scsi 命令完成后，会通过记录在命令内的完成函数回调上层处理，具体是*cmd->scsi_done*。
+
+## 总结 
+
+![img](https://picb.zhimg.com/80/v2-06ec854f9d24542f0c60b1df8f7026f6_720w.jpg)
 

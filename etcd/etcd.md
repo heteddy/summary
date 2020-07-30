@@ -98,7 +98,7 @@ etcd实现了raft协议，raft论文的描述参照文章开头的链接。
 
 # 网络http
 
-raft模块仅实现raft协议相关的逻辑，网络发送交给server raftnode来完成，etcd将 网络实现放在server的api包中，实际上这部分在etcd中并不属于核心域的内容，将其单独放入一个包也是可以的，也更容易实现网络层的替换。
+raft模块仅实现raft协议相关的逻辑，网络发送交给server raftnode来完成，etcd将网络实现放在server的api包中，实际上这部分在etcd中并不属于核心域的内容，将其单独放入一个包也是可以的，也更容易实现网络层的替换。
 
 etcd提供了2个消息发送的通道，**stream和pipeline**
 
@@ -136,7 +136,7 @@ etcd提供了2个消息发送的通道，**stream和pipeline**
 
 + pipline
 
-  发送snapshotmsg
+  发送snapshotmsg，发送时间比较长因此没有配置timeout
 
 + streamRoundTripper
 
@@ -300,7 +300,9 @@ etcd 提供了一种事务机制一次执行多个key value操作.
 
 但是基于上述操作执行一个事务操作也比较麻烦，etcd还提供了一个更方便的操作接口STM() software transactional memory) 事务实现。
 
-### 一个账户向另外一个账户转账例子
+### 例子
+
+一个账户向另外一个账户转账例子
 
 ```go
 	// 创建一个client
