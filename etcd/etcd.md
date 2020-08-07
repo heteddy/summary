@@ -259,7 +259,13 @@ snapshot文件为:
 
 > watch 一个prefix或者范围的情况
 
-通过一个adt.IntervalTree实现了一个范围的监控，adt.IntervalTree本质上是一个红黑树，将一个区间划分成一些单元区间，每个区间都对了应线段树的一个叶节点。
+watcher包含两个实现：
+
++ key watcher
+
++ range watcher
+
+  通过一个adt.IntervalTree实现了一个范围的监控，adt.IntervalTree本质上是一个红黑树，将一个区间划分成一些单元区间，每个区间都对了应线段树的一个叶节点。通过区间查找到对应的watcher。
 
 # MVCC
 

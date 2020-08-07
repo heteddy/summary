@@ -72,7 +72,7 @@ leveldb的基本结构如下：
 
   + log文件的结构，log文件被划分为32k为单位的block，读取和写入都以block为单位，这样做保证了如果block被破坏，不会影响其他的block，仅当前的block内的数据丢失，是一种提高**可用性**的方法。
 
-    ![log结构](https://youjiali1995.github.io/assets/images/leveldb/log.png)
+    ![log.png](https://upload-images.jianshu.io/upload_images/9243349-683d87212d0eb4f3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
     record的格式：
 
@@ -97,7 +97,7 @@ leveldb的基本结构如下：
     1. FULL: 完整的record，没有跨block
     
          		2. First：跨block当前为开头部分
-         		3. Middle：跨block当前为中间部分，可能存在多个
+           		3. Middle：跨block当前为中间部分，可能存在多个
               4. Last：跨block当前为最后部分
 
   
@@ -151,15 +151,17 @@ leveldb的基本结构如下：
 
 + InternalKey 
 
+  internal key实现了MVCC，通过sequence number实现，并且在设置比较操作符的时候，userKey + sequenceNumber(倒序) 这样保证了最新的更新在最前面
+
   `userkey`+`SequnceNumber`|`ValueType`，其中`sequence number`和`valuetype`总共占用64个字节。
 
-  ![](https://youjiali1995.github.io/assets/images/leveldb/memtable_entry.png)
+  ![memtable_entry.png](https://upload-images.jianshu.io/upload_images/9243349-d203a50394081489.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 + WriteBatch
 
   用户提交的多条数据会封装成WriteBatch，每个write batch使用一个sequence number，结构如下：
 
-  ![](https://youjiali1995.github.io/assets/images/leveldb/wal.png)
+  ![wal.png](https://upload-images.jianshu.io/upload_images/9243349-8115e065471c5fed.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
   writebatch中的record会直接保存到log中
 
@@ -365,7 +367,7 @@ level0文件超过一定数量(4)时，都会触发 Compaction 操作。非 Leve
 1. 在调用put/delete API时，检查DBImpl::MakeRoomForWrite, 发现memtable的使用空间超过4M了；
 2. 当前的immtable已经被dump出去成sstable. 也就是immtable=NULL 在上面的两个条件同时满足的情况下，会阻塞写线程，把memtable移到immtable。然后新起一个memtable,删除旧的log文件，让写操作写到这个memtable里。最后将imm放到后台线程去做compaction.
 
-minor compaction是一个时效性要求非常高的过程，要求其在尽可能短的时间内完成，否则就会堵塞正常的写入操作，因此minor compaction的优先级高于major compaction。当进行minor com- paction的时候有major compaction正在进行，则会首先暂停major compaction。
+minor compaction是一个时效性要求非常高的过程，要求其在尽可能短的时间内完成，否则就会堵塞正常的写入操作，因此minor compaction的优先级高于major compaction。当进行minor compaction的时候有major compaction正在进行，则会首先暂停major compaction。
 
 ### Major Compaction
 
@@ -377,7 +379,7 @@ minor compaction是一个时效性要求非常高的过程，要求其在尽可�
 
 以level0为例，执行过程如下：
 
-1. 将 Record 从 Level 0 中读出，并获取这组 Record 的 Key Rang
+1. 将 Record 从 Level 0 中读出，并获取这组 Record 的 Key Range
 2. 扫描 Level 1 中的文件，如果文件的中保存的 Record 和内存中的 Record 的 Key Range 有重叠，则将这个文件中的 Record 也加载到内存，以保证 Level 1 的 Record 在 Compaction 结束后依然是有序的
 3. 将所有加载到内存的 Record 按照 <Key, SN> 进行排序
 4. 如果发现有相同 Key 的 Record，则只保留 SN 最大的 Record
@@ -411,7 +413,7 @@ get操作会获取小于当前sequence或者snapshot指定sequence中最大的�
 * Read the named MANIFEST file
 * Clean up stale files
 * We could open all sstables here, but it is probably better to be lazy...
-* Convert log chunk to a new level-0 sstable
+* Convert log（wal） chunk to a new level-0 sstable
 * Start directing new writes to a new log file with recovered sequence#
 
 ## Compactions
