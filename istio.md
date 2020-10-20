@@ -48,7 +48,7 @@ istio的关键能力：
   + 访问日志
   + 监控
 
-## Istio 架构
+# Istio 架构
 
 数据面，控制面
 
@@ -61,9 +61,7 @@ istio的关键能力：
 
 ![架构](https://pic3.zhimg.com/80/v2-2b1f812684b16f6bd828da0db4f772d8_1440w.jpg)
 
-
-
-### Pilot
+## Pilot
 
 ![](https://pic1.zhimg.com/80/v2-ec5dd596ea07c159aa00e8280179a966_1440w.jpg)
 
@@ -80,6 +78,11 @@ istio的关键能力：
 ![](https://picb.zhimg.com/80/v2-d12bb0244052913d095829b2aeefdfb5_1440w.jpg)
 
 # 组件
+
+包括2个大的组件：
+
++ 数据面
++ 控制面
 
 ## 数据面
 
@@ -143,6 +146,12 @@ listeners:
 ## 控制面
 
 [深入理解Istio核心组件之Pilot](https://www.cnblogs.com/YaoDD/p/11391342.html)
+
+主要包括三个组件：
+
++ pilot
++ Mixer
++ Citadel
 
 ### Pilot
 
