@@ -61,3 +61,9 @@ MESI 是缓存协议4个状态的首字母：
 图片来源网络
 
 后续详细讲解MESI协议。
+
+
+
+
+
+[13 种在 Linux 系统上检测 CPU 信息的工具](https://cloud.tencent.com/developer/article/1114984)
