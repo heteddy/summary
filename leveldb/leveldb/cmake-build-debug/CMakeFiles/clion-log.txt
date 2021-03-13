@@ -1,0 +1,30 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/hedetao/code/leveldb
+CMake Error at CMakeLists.txt:299 (add_subdirectory):
+  The source directory
+
+    /Users/hedetao/code/leveldb/third_party/googletest
+
+  does not contain a CMakeLists.txt file.
+
+
+CMake Error at CMakeLists.txt:304 (add_subdirectory):
+  The source directory
+
+    /Users/hedetao/code/leveldb/third_party/benchmark
+
+  does not contain a CMakeLists.txt file.
+
+
+CMake Error at CMakeLists.txt:308 (set_property):
+  set_property could not find TARGET gtest.  Perhaps it has not yet been
+  created.
+
+
+CMake Error at CMakeLists.txt:310 (set_property):
+  set_property could not find TARGET gmock.  Perhaps it has not yet been
+  created.
+
+
+-- Configuring incomplete, errors occurred!
+See also "/Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "/Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeError.log".
