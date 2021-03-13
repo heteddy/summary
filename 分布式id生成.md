@@ -41,7 +41,7 @@ CachedUidGenerator采用了双RingBuffer，Uid-RingBuffer用于存储Uid、Flag-
 
 [![FalseSharing](https://github.com/baidu/uid-generator/raw/master/doc/cacheline_padding.png)](https://github.com/baidu/uid-generator/blob/master/doc/cacheline_padding.png)
 
-#### RingBuffer填充时机
+## RingBuffer填充时机
 
 - 初始化预填充
   RingBuffer初始化时，预先填充满整个RingBuffer.

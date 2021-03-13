@@ -4,7 +4,9 @@ Sequential lock，简称seq lock，是一种有点特殊的“读写锁”，Lin
 
 ## 基本原理
 
-------
+
+
+
 
 Sequential lock的原理非常简单，其核心就是通过维护一个序号(sequence)来避免读者(Reader)读到错误的数据，而写者(Writer)在加锁和解锁的过程中递增序号，多个写者之间**需要借助于额外的互斥锁**来保证互斥关系。
 

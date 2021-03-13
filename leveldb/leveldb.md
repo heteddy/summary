@@ -88,17 +88,18 @@ leveldb的基本结构如下：
 
     record可能被切分成多块，切分block存在以下三种情况：
 
-     	1. 一个Record刚好在一个Block里面
-     	2. 一个Record被分到两个Block里面
-     	3. 一个Record被切分到多个Block里面。
+    1. 一个Record刚好在一个Block里面
+    2. 一个Record被分到两个Block里面
+    3. 一个Record被切分到多个Block里面。
+
+    
 
     根据上面三种情况将block的type设置为：
-
-    1. FULL: 完整的record，没有跨block
     
-         		2. First：跨block当前为开头部分
-           		3. Middle：跨block当前为中间部分，可能存在多个
-              4. Last：跨block当前为最后部分
+    1. FULL: 完整的record，没有跨block
+    2. First：跨block当前为开头部分
+    3. Middle：跨block当前为中间部分，可能存在多个
+    4. Last：跨block当前为最后部分
 
   
 
