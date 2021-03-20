@@ -27,8 +27,6 @@ panic: runtime error: invalid memory address or nil pointer dereference
 
 要分配内存，就引出来今天的`new`和`make`。
 
-
-
 ```go
 func main() {
 	var i *int
