@@ -1,30 +1,95 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/hedetao/code/leveldb
-CMake Error at CMakeLists.txt:299 (add_subdirectory):
-  The source directory
-
-    /Users/hedetao/code/leveldb/third_party/googletest
-
-  does not contain a CMakeLists.txt file.
-
-
-CMake Error at CMakeLists.txt:304 (add_subdirectory):
-  The source directory
-
-    /Users/hedetao/code/leveldb/third_party/benchmark
-
-  does not contain a CMakeLists.txt file.
-
-
-CMake Error at CMakeLists.txt:308 (set_property):
-  set_property could not find TARGET gtest.  Perhaps it has not yet been
-  created.
-
-
-CMake Error at CMakeLists.txt:310 (set_property):
-  set_property could not find TARGET gmock.  Perhaps it has not yet been
-  created.
-
-
--- Configuring incomplete, errors occurred!
-See also "/Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeOutput.log".
-See also "/Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeError.log".
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/hedetao/code/summary/leveldb/leveldb
+-- The C compiler identification is AppleClang 12.0.0.12000032
+-- The CXX compiler identification is AppleClang 12.0.0.12000032
+-- Check for working C compiler: /Library/Developer/CommandLineTools/usr/bin/cc
+-- Check for working C compiler: /Library/Developer/CommandLineTools/usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /Library/Developer/CommandLineTools/usr/bin/c++
+-- Check for working CXX compiler: /Library/Developer/CommandLineTools/usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Looking for unistd.h
+-- Looking for unistd.h - found
+-- Looking for crc32c_value in crc32c
+-- Looking for crc32c_value in crc32c - not found
+-- Looking for snappy_compress in snappy
+-- Looking for snappy_compress in snappy - not found
+-- Looking for malloc in tcmalloc
+-- Looking for malloc in tcmalloc - not found
+-- Looking for fdatasync
+-- Looking for fdatasync - not found
+-- Looking for F_FULLFSYNC
+-- Looking for F_FULLFSYNC - found
+-- Looking for O_CLOEXEC
+-- Looking for O_CLOEXEC - found
+-- Performing Test HAVE_CLANG_THREAD_SAFETY
+-- Performing Test HAVE_CLANG_THREAD_SAFETY - Success
+-- Performing Test LEVELDB_HAVE_NO_MISSING_FIELD_INITIALIZERS
+-- Performing Test LEVELDB_HAVE_NO_MISSING_FIELD_INITIALIZERS - Success
+-- Performing Test HAVE_CXX17_HAS_INCLUDE
+-- Performing Test HAVE_CXX17_HAS_INCLUDE - Success
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Found PythonInterp: /usr/bin/python (found version "2.7.16") 
+-- Failed to find LLVM FileCheck
+-- Found Git: /usr/bin/git (found version "2.24.3 (Apple Git-128)") 
+-- git Version: v1.5.2-bf585a27
+-- Version: 1.5.2
+-- Performing Test HAVE_CXX_FLAG_STD_CXX11
+-- Performing Test HAVE_CXX_FLAG_STD_CXX11 - Success
+-- Performing Test HAVE_CXX_FLAG_WALL
+-- Performing Test HAVE_CXX_FLAG_WALL - Success
+-- Performing Test HAVE_CXX_FLAG_WEXTRA
+-- Performing Test HAVE_CXX_FLAG_WEXTRA - Success
+-- Performing Test HAVE_CXX_FLAG_WSHADOW
+-- Performing Test HAVE_CXX_FLAG_WSHADOW - Success
+-- Performing Test HAVE_CXX_FLAG_WERROR
+-- Performing Test HAVE_CXX_FLAG_WERROR - Success
+-- Performing Test HAVE_CXX_FLAG_WSHORTEN_64_TO_32
+-- Performing Test HAVE_CXX_FLAG_WSHORTEN_64_TO_32 - Success
+-- Performing Test HAVE_CXX_FLAG_FSTRICT_ALIASING
+-- Performing Test HAVE_CXX_FLAG_FSTRICT_ALIASING - Success
+-- Performing Test HAVE_CXX_FLAG_WNO_DEPRECATED_DECLARATIONS
+-- Performing Test HAVE_CXX_FLAG_WNO_DEPRECATED_DECLARATIONS - Success
+-- Performing Test HAVE_CXX_FLAG_WNO_DEPRECATED
+-- Performing Test HAVE_CXX_FLAG_WNO_DEPRECATED - Success
+-- Performing Test HAVE_CXX_FLAG_FNO_EXCEPTIONS
+-- Performing Test HAVE_CXX_FLAG_FNO_EXCEPTIONS - Success
+-- Performing Test HAVE_CXX_FLAG_WSTRICT_ALIASING
+-- Performing Test HAVE_CXX_FLAG_WSTRICT_ALIASING - Success
+-- Performing Test HAVE_CXX_FLAG_WD654
+-- Performing Test HAVE_CXX_FLAG_WD654 - Failed
+-- Performing Test HAVE_CXX_FLAG_WTHREAD_SAFETY
+-- Performing Test HAVE_CXX_FLAG_WTHREAD_SAFETY - Success
+-- Performing Test HAVE_THREAD_SAFETY_ATTRIBUTES
+-- Performing Test HAVE_THREAD_SAFETY_ATTRIBUTES
+-- Performing Test HAVE_THREAD_SAFETY_ATTRIBUTES -- failed to compile
+-- Performing Test HAVE_CXX_FLAG_COVERAGE
+-- Performing Test HAVE_CXX_FLAG_COVERAGE - Success
+-- Performing Test HAVE_STD_REGEX
+-- Performing Test HAVE_STD_REGEX
+-- Performing Test HAVE_STD_REGEX -- success
+-- Performing Test HAVE_GNU_POSIX_REGEX
+-- Performing Test HAVE_GNU_POSIX_REGEX
+-- Performing Test HAVE_GNU_POSIX_REGEX -- failed to compile
+-- Performing Test HAVE_POSIX_REGEX
+-- Performing Test HAVE_POSIX_REGEX
+-- Performing Test HAVE_POSIX_REGEX -- success
+-- Performing Test HAVE_STEADY_CLOCK
+-- Performing Test HAVE_STEADY_CLOCK
+-- Performing Test HAVE_STEADY_CLOCK -- success
+-- Looking for sqlite3_open in sqlite3
+-- Looking for sqlite3_open in sqlite3 - found
+-- Performing Test HAVE_KYOTOCABINET
+-- Performing Test HAVE_KYOTOCABINET - Failed
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug

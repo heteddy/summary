@@ -21,43 +21,43 @@ clang: error: linker command failed with exit code 1 (use -v to see invocation)
 
 
 Determining if the function crc32c_value exists in the crc32c failed with the following output:
-Change Dir: /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_e479b/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_e479b.dir/build.make CMakeFiles/cmTC_e479b.dir/build
-Building C object CMakeFiles/cmTC_e479b.dir/CheckFunctionExists.c.o
-/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=crc32c_value -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c11 -o CMakeFiles/cmTC_e479b.dir/CheckFunctionExists.c.o   -c /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c
-Linking C executable cmTC_e479b
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e479b.dir/link.txt --verbose=1
-/Library/Developer/CommandLineTools/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=crc32c_value -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_e479b.dir/CheckFunctionExists.c.o  -o cmTC_e479b -lcrc32c 
+Run Build Command(s):/usr/bin/make cmTC_f635f/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_f635f.dir/build.make CMakeFiles/cmTC_f635f.dir/build
+Building C object CMakeFiles/cmTC_f635f.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=crc32c_value -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c11 -o CMakeFiles/cmTC_f635f.dir/CheckFunctionExists.c.o   -c /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f635f
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f635f.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=crc32c_value -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_f635f.dir/CheckFunctionExists.c.o  -o cmTC_f635f -lcrc32c 
 ld: library not found for -lcrc32c
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
-make[1]: *** [cmTC_e479b] Error 1
-make: *** [cmTC_e479b/fast] Error 2
+make[1]: *** [cmTC_f635f] Error 1
+make: *** [cmTC_f635f/fast] Error 2
 
 
 
 Determining if the function snappy_compress exists in the snappy failed with the following output:
-Change Dir: /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_d4b0a/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_d4b0a.dir/build.make CMakeFiles/cmTC_d4b0a.dir/build
-Building C object CMakeFiles/cmTC_d4b0a.dir/CheckFunctionExists.c.o
-/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=snappy_compress -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c11 -o CMakeFiles/cmTC_d4b0a.dir/CheckFunctionExists.c.o   -c /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c
-Linking C executable cmTC_d4b0a
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d4b0a.dir/link.txt --verbose=1
-/Library/Developer/CommandLineTools/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=snappy_compress -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_d4b0a.dir/CheckFunctionExists.c.o  -o cmTC_d4b0a -lsnappy 
+Run Build Command(s):/usr/bin/make cmTC_9862e/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_9862e.dir/build.make CMakeFiles/cmTC_9862e.dir/build
+Building C object CMakeFiles/cmTC_9862e.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=snappy_compress -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c11 -o CMakeFiles/cmTC_9862e.dir/CheckFunctionExists.c.o   -c /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c
+Linking C executable cmTC_9862e
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9862e.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=snappy_compress -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_9862e.dir/CheckFunctionExists.c.o  -o cmTC_9862e -lsnappy 
 ld: library not found for -lsnappy
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
-make[1]: *** [cmTC_d4b0a] Error 1
-make: *** [cmTC_d4b0a/fast] Error 2
+make[1]: *** [cmTC_9862e] Error 1
+make: *** [cmTC_9862e/fast] Error 2
 
 
 
 Determining if the function malloc exists in the tcmalloc failed with the following output:
-Change Dir: /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_04185/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_04185.dir/build.make CMakeFiles/cmTC_04185.dir/build
-Building C object CMakeFiles/cmTC_04185.dir/CheckFunctionExists.c.o
-/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=malloc -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c11 -o CMakeFiles/cmTC_04185.dir/CheckFunctionExists.c.o   -c /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c
+Run Build Command(s):/usr/bin/make cmTC_f7bf2/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_f7bf2.dir/build.make CMakeFiles/cmTC_f7bf2.dir/build
+Building C object CMakeFiles/cmTC_f7bf2.dir/CheckFunctionExists.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=malloc -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c11 -o CMakeFiles/cmTC_f7bf2.dir/CheckFunctionExists.c.o   -c /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c
 /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.15/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'malloc' [-Wincompatible-library-redeclaration]
   CHECK_FUNCTION_EXISTS(void);
   ^
@@ -69,31 +69,31 @@ Building C object CMakeFiles/cmTC_04185.dir/CheckFunctionExists.c.o
 #define CHECK_FUNCTION_EXISTS malloc
                               ^
 1 warning generated.
-Linking C executable cmTC_04185
-/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E cmake_link_script CMakeFiles/cmTC_04185.dir/link.txt --verbose=1
-/Library/Developer/CommandLineTools/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=malloc -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_04185.dir/CheckFunctionExists.c.o  -o cmTC_04185 -ltcmalloc 
+Linking C executable cmTC_f7bf2
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f7bf2.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=malloc -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_f7bf2.dir/CheckFunctionExists.c.o  -o cmTC_f7bf2 -ltcmalloc 
 ld: library not found for -ltcmalloc
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
-make[1]: *** [cmTC_04185] Error 1
-make: *** [cmTC_04185/fast] Error 2
+make[1]: *** [cmTC_f7bf2] Error 1
+make: *** [cmTC_f7bf2/fast] Error 2
 
 
 
 Determining if the fdatasync exist failed with the following output:
-Change Dir: /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_7e380/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_7e380.dir/build.make CMakeFiles/cmTC_7e380.dir/build
-Building CXX object CMakeFiles/cmTC_7e380.dir/CheckSymbolExists.cxx.o
-/Library/Developer/CommandLineTools/usr/bin/c++    -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c++11 -o CMakeFiles/cmTC_7e380.dir/CheckSymbolExists.cxx.o -c /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
-/Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:8:19: error: use of undeclared identifier 'fdatasync'
+Run Build Command(s):/usr/bin/make cmTC_bf4a6/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_bf4a6.dir/build.make CMakeFiles/cmTC_bf4a6.dir/build
+Building CXX object CMakeFiles/cmTC_bf4a6.dir/CheckSymbolExists.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++    -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c++11 -o CMakeFiles/cmTC_bf4a6.dir/CheckSymbolExists.cxx.o -c /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx
+/Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:8:19: error: use of undeclared identifier 'fdatasync'
   return ((int*)(&fdatasync))[argc];
                   ^
 1 error generated.
-make[1]: *** [CMakeFiles/cmTC_7e380.dir/CheckSymbolExists.cxx.o] Error 1
-make: *** [cmTC_7e380/fast] Error 2
+make[1]: *** [CMakeFiles/cmTC_bf4a6.dir/CheckSymbolExists.cxx.o] Error 1
+make: *** [cmTC_bf4a6/fast] Error 2
 
 
-File /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
+File /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.cxx:
 /* */
 #include <unistd.h>
 
@@ -108,18 +108,32 @@ int main(int argc, char** argv)
 #endif
 }
 
-Performing C++ SOURCE FILE Test HAVE_KYOTOCABINET failed with the following output:
-Change Dir: /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
+Performing C++ SOURCE FILE Test HAVE_CXX_FLAG_WD654 failed with the following output:
+Change Dir: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_4d7f8/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_4d7f8.dir/build.make CMakeFiles/cmTC_4d7f8.dir/build
-Building CXX object CMakeFiles/cmTC_4d7f8.dir/src.cxx.o
-/Library/Developer/CommandLineTools/usr/bin/c++    -fno-exceptions -fno-rtti -DHAVE_KYOTOCABINET -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c++11 -o CMakeFiles/cmTC_4d7f8.dir/src.cxx.o -c /Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/src.cxx
-/Users/hedetao/code/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: 'kcpolydb.h' file not found
+Run Build Command(s):/usr/bin/make cmTC_92c33/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_92c33.dir/build.make CMakeFiles/cmTC_92c33.dir/build
+Building CXX object CMakeFiles/cmTC_92c33.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++    -fno-exceptions -fno-rtti  -std=c++11  -Wall  -Wextra  -Wshadow  -Wshorten-64-to-32  -fstrict-aliasing  -Wno-deprecated-declarations  -fno-exceptions  -Wstrict-aliasing -DHAVE_CXX_FLAG_WD654  -wd654 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -wd654 -std=c++11 -o CMakeFiles/cmTC_92c33.dir/src.cxx.o -c /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/src.cxx
+clang: error: unknown argument: '-wd654'
+clang: error: unknown argument: '-wd654'
+make[1]: *** [CMakeFiles/cmTC_92c33.dir/src.cxx.o] Error 1
+make: *** [cmTC_92c33/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAVE_KYOTOCABINET failed with the following output:
+Change Dir: /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_62413/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_62413.dir/build.make CMakeFiles/cmTC_62413.dir/build
+Building CXX object CMakeFiles/cmTC_62413.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++    -fno-exceptions -fno-rtti -DHAVE_KYOTOCABINET -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk   -std=c++11 -o CMakeFiles/cmTC_62413.dir/src.cxx.o -c /Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/src.cxx
+/Users/hedetao/code/summary/leveldb/leveldb/cmake-build-debug/CMakeFiles/CMakeTmp/src.cxx:2:10: fatal error: 'kcpolydb.h' file not found
 #include <kcpolydb.h>
          ^~~~~~~~~~~~
 1 error generated.
-make[1]: *** [CMakeFiles/cmTC_4d7f8.dir/src.cxx.o] Error 1
-make: *** [cmTC_4d7f8/fast] Error 2
+make[1]: *** [CMakeFiles/cmTC_62413.dir/src.cxx.o] Error 1
+make: *** [cmTC_62413/fast] Error 2
 
 
 Source file was:
