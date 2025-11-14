@@ -1,6 +1,6 @@
 [https://news.qq.com/rain/a/20250805A04BNS00](https://news.qq.com/rain/a/20250805A04BNS00)
 
-# 自我进化智能体：机器如何像人类一样学习和成长？普林斯顿大学等多家机构揭秘通往超级人工智能的新路径   
+# 自我进化智能体：机器如何像人类一样学习和成长？普林斯顿大学等多家机构揭秘通往超级人工智能的新路径
 
 [https://news.qq.com/rain/a/20250805A04BNS00](https://news.qq.com/rain/a/20250805A04BNS00)
 
@@ -11,3 +11,5 @@
 # 智能进化：ACE框架如何让AI自我完善，表现超越GPT-4
 
 [https://zhuanlan.zhihu.com/p/1960007690320351348](https://zhuanlan.zhihu.com/p/1960007690320351348)
+
+[2万字长文！一文了解Attention，从MHA到DeepSeek MLA，大量图解，非常详细！](https://mp.weixin.qq.com/s?__biz=MzUzOTgwNDMzOQ==&mid=2247502844&idx=1&sn=067165341bbfeba775fa4301a9d1095e&scene=21&poc_token=HF7pFmmjnv7pSg8MRPFfp7rZm7O8-PT2IKpIRWvD)
