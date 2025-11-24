@@ -1,0 +1,56 @@
+# Linear
+"Linear" 表示神经网络的线性层，也称为全连接层或密集层。它接收输入并应用线性变换，将每个输入与对应的权重相乘并求和，然后加上偏置。该层没有激活函数。线性层常用于将输入数据映射到下一层的特征空间。
+> 只包含线性运算，没有非线性激活函数
+```python
+# 以下是使用PyTorch库的示例代码：
+import torch
+import torch.nn as nn
+# 定义线性层
+linear_layer = nn.Linear(in_features=10, out_features=5)
+# 创建输入
+input_data = torch.randn(1, 10)  # 假设输入维度为10
+# 应用线性变换
+output = linear_layer(input_data)
+print(output)
+```
+
+# FC 全连接
+FC（全连接）： `FC` 表示全连接层，与 `Linear` 的含义相同。在神经网络中，全连接层是指每个神经元都与上一层的所有神经元相连接。每个连接都有一个权重，用于线性变换。
+
+
+# FFN MLP
+`FFN` 和 `MLP 表示前馈神经网络和多层感知机，它们在概念上是相同的。前馈神经网络是一种最常见的神经网络结构，由多个全连接层组成，层与层之间是前向传播的。多层感知机是一种前馈神经网络的具体实现，其中至少有一个隐藏层。
+
+``` python
+import torch
+import torch.nn as nn
+
+# 创建前馈神经网络模型
+class FFN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(FFN, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        return out
+
+# 创建输入数据
+input_data = torch.randn(1, 10)  # 假设输入维度为10
+
+# 定义模型参数
+input_size = 10
+hidden_size = 64
+output_size = 1
+
+# 创建前馈神经网络模型实例
+model = FFN(input_size, hidden_size, output_size)
+
+# 前向传播
+output = model(input_data)
+print(output)
+```
