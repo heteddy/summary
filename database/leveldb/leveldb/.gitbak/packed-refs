@@ -1,0 +1,25 @@
+# pack-refs with: peeled fully-peeled sorted 
+031ae8e2dba4a7ca79f64088db989186475a0b68 refs/remotes/origin/doc-testing
+77c27645e49ec13967a7b5a271c666ddf0342f45 refs/remotes/origin/env_rename
+4a919ea4f7cf2b78bb1403e40b4888f592610c5a refs/remotes/origin/master
+1a9648e1f55be762042263df5dc7cb6388702e25 refs/remotes/origin/reuse-manifest
+56178ddaf4d3ba6c8d1cfb218610b1be3f5aa710 refs/tags/1.21
+78b39d68c15ba020c0d60a3906fb66dbf1697595 refs/tags/1.22
+28dad918f2ffb80fd70110ed5cd47744339649f2 refs/tags/v1.10
+7b094f12e46a45b911f20f7bd2ca96f83e272d91 refs/tags/v1.11
+5bd76dc10d840df23255ba0e635083a2a94e0461 refs/tags/v1.12
+748539c183453bdeaff1eb0da8ccf5adacb796e7 refs/tags/v1.13
+0b9a89f40efdd143fa1426e7d5cd997f67ba6361 refs/tags/v1.14
+0cfb990d58ffba9b56df6e9829ddb9d220824066 refs/tags/v1.15
+269fc6ca9416129248db5ca57050cd5d39d177c8 refs/tags/v1.16
+e353fbc7ea81f12a5694991b708f8f45343594b1 refs/tags/v1.17
+803d69203a62faf50f1b77897310a3a1fcae712b refs/tags/v1.18
+3080a45b626f8ddb474bc5e860796a48b51b3cf0 refs/tags/v1.19
+a53934a3ae1244679f812d998a4f16f2c7f309a6 refs/tags/v1.20
+bc1ee4d25e09b04e074db330a41f54ef4af0e31b refs/tags/v1.3
+85584d497e7b354853b72f450683d59fcf6b9c5c refs/tags/v1.4
+dd0d562b4d4fbd07db6a44f9e221f8d368fee8e4 refs/tags/v1.5
+946e5b5a4ce7980917b22a408f090a4e86c3fa44 refs/tags/v1.6
+40768657bc8ec3ded60712eeeab7c25b1b07deca refs/tags/v1.7
+ea2e9195fc241c8fe9f329679d7a424345c68c7b refs/tags/v1.8
+d84c825a70a843bb107de8b732cb79e584cefd17 refs/tags/v1.9

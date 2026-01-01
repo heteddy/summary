@@ -1,0 +1,900 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>etcd</title><link href='https://fonts.loli.net/css?family=PT+Serif:400,400italic,700,700italic&subset=latin,cyrillic-ext,cyrillic,latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 32px; padding-right: 32px; padding-bottom: 0px; break-after: avoid; }
+  .typora-export #write::after { height: 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus, [contenteditable="false"]:active, [contenteditable="false"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="flow"] svg, [lang="mermaid"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+svg[id^="mermaidChart"] { line-height: 1em; }
+mark { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); background-position: initial initial; background-repeat: initial initial; }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
+
+
+.CodeMirror { height: auto; }
+.CodeMirror.cm-s-inner { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-scroll { overflow: auto hidden; z-index: 3; }
+.CodeMirror-gutter-filler, .CodeMirror-scrollbar-filler { background-color: rgb(255, 255, 255); }
+.CodeMirror-gutters { border-right-width: 1px; border-right-style: solid; border-right-color: rgb(221, 221, 221); background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; white-space: nowrap; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-linenumber { padding: 0px 3px 0px 5px; text-align: right; color: rgb(153, 153, 153); }
+.cm-s-inner .cm-keyword { color: rgb(119, 0, 136); }
+.cm-s-inner .cm-atom, .cm-s-inner.cm-atom { color: rgb(34, 17, 153); }
+.cm-s-inner .cm-number { color: rgb(17, 102, 68); }
+.cm-s-inner .cm-def { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-variable { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-variable-2 { color: rgb(0, 85, 170); }
+.cm-s-inner .cm-variable-3 { color: rgb(0, 136, 85); }
+.cm-s-inner .cm-string { color: rgb(170, 17, 17); }
+.cm-s-inner .cm-property { color: rgb(0, 0, 0); }
+.cm-s-inner .cm-operator { color: rgb(152, 26, 26); }
+.cm-s-inner .cm-comment, .cm-s-inner.cm-comment { color: rgb(170, 85, 0); }
+.cm-s-inner .cm-string-2 { color: rgb(255, 85, 0); }
+.cm-s-inner .cm-meta { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-qualifier { color: rgb(85, 85, 85); }
+.cm-s-inner .cm-builtin { color: rgb(51, 0, 170); }
+.cm-s-inner .cm-bracket { color: rgb(153, 153, 119); }
+.cm-s-inner .cm-tag { color: rgb(17, 119, 0); }
+.cm-s-inner .cm-attribute { color: rgb(0, 0, 204); }
+.cm-s-inner .cm-header, .cm-s-inner.cm-header { color: rgb(0, 0, 255); }
+.cm-s-inner .cm-quote, .cm-s-inner.cm-quote { color: rgb(0, 153, 0); }
+.cm-s-inner .cm-hr, .cm-s-inner.cm-hr { color: rgb(153, 153, 153); }
+.cm-s-inner .cm-link, .cm-s-inner.cm-link { color: rgb(0, 0, 204); }
+.cm-negative { color: rgb(221, 68, 68); }
+.cm-positive { color: rgb(34, 153, 34); }
+.cm-header, .cm-strong { font-weight: 700; }
+.cm-del { text-decoration: line-through; }
+.cm-em { font-style: italic; }
+.cm-link { text-decoration: underline; }
+.cm-error { color: red; }
+.cm-invalidchar { color: red; }
+.cm-constant { color: rgb(38, 139, 210); }
+.cm-defined { color: rgb(181, 137, 0); }
+div.CodeMirror span.CodeMirror-matchingbracket { color: rgb(0, 255, 0); }
+div.CodeMirror span.CodeMirror-nonmatchingbracket { color: rgb(255, 34, 34); }
+.cm-s-inner .CodeMirror-activeline-background { background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror { position: relative; overflow: hidden; }
+.CodeMirror-scroll { height: 100%; outline: 0px; position: relative; box-sizing: content-box; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; background-position: inherit inherit; background-repeat: inherit inherit; }
+.CodeMirror-sizer { position: relative; }
+.CodeMirror-gutter-filler, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-vscrollbar { position: absolute; z-index: 6; display: none; }
+.CodeMirror-vscrollbar { right: 0px; top: 0px; overflow: hidden; }
+.CodeMirror-hscrollbar { bottom: 0px; left: 0px; overflow: hidden; }
+.CodeMirror-scrollbar-filler { right: 0px; bottom: 0px; }
+.CodeMirror-gutter-filler { left: 0px; bottom: 0px; }
+.CodeMirror-gutters { position: absolute; left: 0px; top: 0px; padding-bottom: 30px; z-index: 3; }
+.CodeMirror-gutter { white-space: normal; height: 100%; box-sizing: content-box; padding-bottom: 30px; margin-bottom: -32px; display: inline-block; }
+.CodeMirror-gutter-wrapper { position: absolute; z-index: 4; border: none !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.CodeMirror-gutter-background { position: absolute; top: 0px; bottom: 0px; z-index: 4; }
+.CodeMirror-gutter-elt { position: absolute; cursor: default; z-index: 4; }
+.CodeMirror-lines { cursor: text; }
+.CodeMirror pre { border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-width: 0px; font-family: inherit; font-size: inherit; margin: 0px; white-space: pre; word-wrap: normal; color: inherit; z-index: 2; position: relative; overflow: visible; background-position: 0px 0px; background-repeat: initial initial; }
+.CodeMirror-wrap pre { word-wrap: break-word; white-space: pre-wrap; word-break: normal; }
+.CodeMirror-code pre { border-right-width: 30px; border-right-style: solid; border-right-color: transparent; width: fit-content; }
+.CodeMirror-wrap .CodeMirror-code pre { border-right-style: none; width: auto; }
+.CodeMirror-linebackground { position: absolute; left: 0px; right: 0px; top: 0px; bottom: 0px; z-index: 0; }
+.CodeMirror-linewidget { position: relative; z-index: 2; overflow: auto; }
+.CodeMirror-wrap .CodeMirror-scroll { overflow-x: hidden; }
+.CodeMirror-measure { position: absolute; width: 100%; height: 0px; overflow: hidden; visibility: hidden; }
+.CodeMirror-measure pre { position: static; }
+.CodeMirror div.CodeMirror-cursor { position: absolute; visibility: hidden; border-right-style: none; width: 0px; }
+.CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+.CodeMirror-focused div.CodeMirror-cursor { visibility: inherit; }
+.cm-searching { background-color: rgba(255, 255, 0, 0.4); background-position: initial initial; background-repeat: initial initial; }
+@media print { 
+  .CodeMirror div.CodeMirror-cursor { visibility: hidden; }
+}
+
+
+/* meyer reset -- http://meyerweb.com/eric/tools/css/reset/ , v2.0 | 20110126 | License: none (public domain) */
+
+@include-when-export url(https://fonts.loli.net/css?family=PT+Serif:400,400italic,700,700italic&subset=latin,cyrillic-ext,cyrillic,latin-ext);
+
+/* =========== */
+
+:root {
+	--active-file-bg-color: #dadada;
+	--active-file-bg-color: rgba(32, 43, 51, 0.63);
+	--active-file-text-color: white;
+	--bg-color: #f3f2ee;
+	--text-color: #1f0909;
+	--control-text-color: #444;
+	--rawblock-edit-panel-bd: #e5e5e5;
+
+	--select-text-bg-color: rgba(32, 43, 51, 0.63);
+  --select-text-font-color: white;
+}
+
+pre {
+	--select-text-bg-color: #36284e;
+	--select-text-font-color: #fff;
+}
+
+html {
+	font-size: 16px;
+}
+
+html, body {
+	background-color: #f3f2ee;
+	font-family: "PT Serif", 'Times New Roman', Times, serif;
+	color: #1f0909;
+	line-height: 1.5em;
+}
+
+/*#write {
+	overflow-x: auto;
+    max-width: initial;
+	padding-left: calc(50% - 17em);
+    padding-right: calc(50% - 17em);
+}
+
+@media (max-width: 36em) {
+ 	#write {
+ 		padding-left: 1em;
+    	padding-right: 1em;
+ 	}
+}*/
+
+#write {
+	max-width: 40em;
+}
+
+ol li {
+	list-style-type: decimal;
+	list-style-position: outside;
+}
+ul li {
+	list-style-type: disc;
+	list-style-position: outside;
+}
+
+ol,
+ul {
+	list-style: none;
+}
+
+blockquote,
+q {
+	quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+/* styles */
+
+/* ====== */
+
+/* headings */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: bold;
+}
+h1 {
+	font-size: 1.875em;
+	/*30 / 16*/
+	line-height: 1.6em;
+	/* 48 / 30*/
+	margin-top: 2em;
+}
+h2,
+h3 {
+	font-size: 1.3125em;
+	/*21 / 16*/
+	line-height: 1.15;
+	/*24 / 21*/
+	margin-top: 2.285714em;
+	/*48 / 21*/
+	margin-bottom: 1.15em;
+	/*24 / 21*/
+}
+h3 {
+	font-weight: normal;
+}
+h4 {
+	font-size: 1.125em;
+	/*18 / 16*/
+	margin-top: 2.67em;
+	/*48 / 18*/
+}
+h5,
+h6 {
+	font-size: 1em;
+	/*16*/
+}
+h1 {
+	border-bottom: 1px solid;
+	margin-bottom: 1.875em;
+	padding-bottom: 0.8125em;
+}
+/* links */
+
+a {
+	text-decoration: none;
+	color: #065588;
+}
+a:hover,
+a:active {
+	text-decoration: underline;
+}
+/* block spacing */
+
+p,
+blockquote,
+.md-fences {
+	margin-bottom: 1.5em;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-bottom: 1.5em;
+}
+/* blockquote */
+
+blockquote {
+	font-style: italic;
+	border-left: 5px solid;
+	margin-left: 2em;
+	padding-left: 1em;
+}
+/* lists */
+
+ul,
+ol {
+	margin: 0 0 1.5em 1.5em;
+}
+/* tables */
+.md-meta,.md-before, .md-after {
+	color:#999;
+}
+
+table {
+	margin-bottom: 1.5em;
+	/*24 / 16*/
+	font-size: 1em;
+	/* width: 100%; */
+}
+thead th,
+tfoot th {
+	padding: .25em .25em .25em .4em;
+	text-transform: uppercase;
+}
+th {
+	text-align: left;
+}
+td {
+	vertical-align: top;
+	padding: .25em .25em .25em .4em;
+}
+
+code,
+.md-fences {
+	background-color: #dadada;
+}
+
+code {
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.md-fences {
+	margin-left: 2em;
+	margin-bottom: 3em;
+	padding-left: 1ch;
+	padding-right: 1ch;
+}
+
+pre,
+code,
+tt {
+	font-size: .875em;
+	line-height: 1.714285em;
+}
+/* some fixes */
+
+h1 {
+	line-height: 1.3em;
+	font-weight: normal;
+	margin-bottom: 0.5em;
+}
+
+p + ul,
+p + ol{
+	margin-top: .5em;
+}
+
+h3 + ul,
+h4 + ul,
+h5 + ul,
+h6 + ul,
+h3 + ol,
+h4 + ol,
+h5 + ol,
+h6 + ol {
+	margin-top: .5em;
+}
+
+li > ul,
+li > ol {
+	margin-top: inherit;
+	margin-bottom: 0;
+}
+
+li ol>li {
+	list-style-type: lower-alpha;
+}
+
+li li ol>li{
+	list-style-type: lower-roman;
+}
+
+h2,
+h3 {
+	margin-bottom: .75em;
+}
+hr {
+	border-top: none;
+	border-right: none;
+	border-bottom: 1px solid;
+	border-left: none;
+}
+h1 {
+	border-color: #c5c5c5;
+}
+blockquote {
+	border-color: #bababa;
+	color: #656565;
+}
+
+blockquote ul,
+blockquote ol {
+	margin-left:0;
+}
+
+.ty-table-edit {
+	background-color: transparent;
+}
+thead {
+	background-color: #dadada;
+}
+tr:nth-child(even) {
+	background: #e8e7e7;
+}
+hr {
+	border-color: #c5c5c5;
+}
+.task-list{
+	padding-left: 1rem;
+}
+
+.md-task-list-item {
+	padding-left: 1.5rem;
+	list-style-type: none;
+}
+
+.md-task-list-item > input:before {
+	content: '\221A';
+	display: inline-block;
+	width: 1.25rem;
+  	height: 1.6rem;
+	vertical-align: middle;
+	text-align: center;
+	color: #ddd;
+	background-color: #F3F2EE;
+}
+
+.md-task-list-item > input:checked:before,
+.md-task-list-item > input[checked]:before{
+	color: inherit;
+}
+
+#write pre.md-meta-block {
+	min-height: 1.875rem;
+	color: #555;
+	border: 0px;
+	background: transparent;
+	margin-top: -4px;
+	margin-left: 1em;
+	margin-top: 1em;
+}
+
+.md-image>.md-meta {
+	color: #9B5146;
+}
+
+.md-image>.md-meta{
+	font-family: Menlo, 'Ubuntu Mono', Consolas, 'Courier New', 'Microsoft Yahei', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', serif;
+}
+
+
+#write>h3.md-focus:before{
+	left: -1.5rem;
+	color:#999;
+	border-color:#999;
+}
+#write>h4.md-focus:before{
+	left: -1.5rem;
+	top: .25rem;
+	color:#999;
+	border-color:#999;
+}
+#write>h5.md-focus:before{
+	left: -1.5rem;
+	top: .0.3125rem;
+	color:#999;
+	border-color:#999;
+}
+#write>h6.md-focus:before{
+	left: -1.5rem;
+	top: 0.3125rem;
+	color:#999;
+	border-color:#999;
+}
+
+.md-toc:focus .md-toc-content{
+	margin-top: 19px;
+}
+
+.md-toc-content:empty:before{
+	color: #065588;
+}
+.md-toc-item {
+	color: #065588;
+}
+#write div.md-toc-tooltip {
+	background-color: #f3f2ee;
+}
+
+#typora-sidebar {
+	background-color: #f3f2ee;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.375);
+  	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.375);
+}
+
+.pin-outline #typora-sidebar {
+	background: inherit;
+	box-shadow: none;
+	border-right: 1px dashed;
+}
+
+.pin-outline #typora-sidebar:hover .outline-title-wrapper {
+	border-left:1px dashed;
+}
+
+.outline-item:hover {
+  background-color: #dadada;
+  border-left: 28px solid #dadada;
+  border-right: 18px solid #dadada;
+}
+
+.typora-node .outline-item:hover {
+  	border-right: 28px solid #dadada;
+}
+
+.outline-expander:before {
+  content: "\f0da";
+  font-family: FontAwesome;
+  font-size:14px;
+  top: 1px;
+}
+
+.outline-expander:hover:before,
+.outline-item-open>.outline-item>.outline-expander:before {
+  content: "\f0d7";
+}
+
+.modal-content {
+	background-color: #f3f2ee;
+}
+
+.auto-suggest-container ul li {
+	list-style-type: none;
+}
+
+/** UI for electron */
+
+.megamenu-menu,
+#top-titlebar, #top-titlebar *,
+.megamenu-content {
+	background: #f3f2ee;
+	color: #1f0909;
+}
+
+.megamenu-menu-header {
+	border-bottom: 1px dashed #202B33;
+}
+
+.megamenu-menu {
+	box-shadow: none;
+	border-right: 1px dashed;
+}
+
+header, .context-menu, .megamenu-content, footer {
+	font-family: "PT Serif", 'Times New Roman', Times, serif;
+    color: #1f0909;
+}
+
+#megamenu-back-btn {
+	color: #1f0909;
+	border-color: #1f0909;
+}
+
+.megamenu-menu-header #megamenu-menu-header-title:before {
+	color: #1f0909;
+}
+
+.megamenu-menu-list li a:hover, .megamenu-menu-list li a.active {
+	color: inherit;
+	background-color: #e8e7df;
+}
+
+.long-btn:hover {
+	background-color: #e8e7df;
+}
+
+#recent-file-panel tbody tr:nth-child(2n-1) {
+    background-color: transparent !important;
+}
+
+.megamenu-menu-panel tbody tr:hover td:nth-child(2) {
+    color: inherit;
+}
+
+.megamenu-menu-panel .btn {
+	background-color: #D2D1D1;
+}
+
+.btn-default {
+	background-color: transparent;
+}
+
+.typora-sourceview-on #toggle-sourceview-btn,
+.ty-show-word-count #footer-word-count {
+	background: #c7c5c5;
+}
+
+#typora-quick-open {
+    background-color: inherit;
+}
+
+.md-diagram-panel {
+	margin-top: 8px;
+}
+
+.file-list-item-file-name {
+	font-weight: initial;
+}
+
+.file-list-item-summary {
+	opacity: 1;
+}
+
+.file-list-item {
+	color: #777;
+}
+
+.file-list-item.active {
+	background-color: inherit;
+	color: black;
+}
+
+.ty-side-sort-btn.active {
+	background-color: inherit;
+}
+
+.file-list-item.active .file-list-item-file-name  {
+	font-weight: bold;
+}
+
+.file-list-item{
+    opacity:1 !important;
+}
+
+.file-library-node.active>.file-node-background{
+	background-color: rgba(32, 43, 51, 0.63);
+	background-color: var(--active-file-bg-color);
+}
+
+.file-tree-node.active>.file-node-content{
+	color: white;
+	color: var(--active-file-text-color);
+}
+
+.md-task-list-item>input {
+	margin-left: -1.7em;
+	margin-top: calc(1rem - 12px);
+}
+
+input {
+	border: 1px solid #aaa;
+}
+
+.megamenu-menu-header #megamenu-menu-header-title,
+.megamenu-menu-header:hover, 
+.megamenu-menu-header:focus {
+	color: inherit;
+}
+
+.dropdown-menu .divider {
+	border-color: #e5e5e5;
+}
+
+/* https://github.com/typora/typora-issues/issues/2046 */
+.os-windows-7 strong,
+.os-windows-7 strong  {
+	font-weight: 760;
+}
+
+.ty-preferences .btn-default {
+	background: transparent;
+}
+
+.ty-preferences .window-header {
+	border-bottom: 1px dashed #202B33;
+	box-shadow: none;
+}
+
+#sidebar-loading-template, #sidebar-loading-template.file-list-item {
+	color: #777;
+}
+#write {
+    counter-reset: h1
+}
+
+h1 {
+    counter-reset: h2
+}
+
+h2 {
+    counter-reset: h3
+}
+
+h3 {
+    counter-reset: h4
+}
+
+h4 {
+    counter-reset: h5
+}
+
+h5 {
+    counter-reset: h6
+}
+
+#write h1:before {
+    counter-increment: h1;
+    content: counter(h1) ". "
+}
+
+#write h2:before {
+    counter-increment: h2;
+    content: counter(h1) "." counter(h2) ". "
+}
+
+#write h3:before,
+h3.md-focus.md-heading:before {
+    counter-increment: h3;
+    content: counter(h1) "." counter(h2) "." counter(h3) ". "
+}
+
+#write h4:before,
+h4.md-focus.md-heading:before {
+    counter-increment: h4;
+    content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) ". "
+}
+
+#write h5:before,
+h5.md-focus.md-heading:before {
+    counter-increment: h5;
+    content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) ". "
+}
+
+#write h6:before,
+h6.md-focus.md-heading:before {
+    counter-increment: h6;
+    content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) "." counter(h5) "." counter(h6) "."
+}
+
+#write > h3.md-focus:before,
+#write > h4.md-focus:before,
+#write > h5.md-focus:before,
+#write > h6.md-focus:before,
+h3.md-focus:before,
+h4.md-focus:before,
+h5.md-focus:before,
+h6.md-focus:before {
+    color: inherit;
+    border: inherit;
+    border-radius: inherit;
+    position: inherit;
+    left: initial;
+    float: none;
+    top: initial;
+    font-size: inherit;
+    padding-left: inherit;
+    padding-right: inherit;
+    vertical-align: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+}
+
+
+</style>
+</head>
+<body class='typora-export' >
+<div  id='write'  class = 'is-mac'><div class='md-toc' mdtype='toc'><p class="md-toc-content" role="list"><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3540"><a class="md-toc-inner" href="#基本架构">基本架构</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3571"><a class="md-toc-inner" href="#启动">启动</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3578"><a class="md-toc-inner" href="#重点分析startetcd">重点分析startEtcd</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3596"><a class="md-toc-inner" href="#raft">RAFT</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3598"><a class="md-toc-inner" href="#角色">角色</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3627"><a class="md-toc-inner" href="#网络http">网络http</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3665"><a class="md-toc-inner" href="#发送流程">发送流程</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3679"><a class="md-toc-inner" href="#数据流">数据流</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3680"><a class="md-toc-inner" href="#client-put">client Put</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3711"><a class="md-toc-inner" href="#wal">WAL</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3727"><a class="md-toc-inner" href="#wal-n3727">wal</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3742"><a class="md-toc-inner" href="#读取">读取</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3745"><a class="md-toc-inner" href="#追加">追加</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3748"><a class="md-toc-inner" href="#切换">切换</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3751"><a class="md-toc-inner" href="#snapshotter">snapshotter</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3754"><a class="md-toc-inner" href="#storage">Storage</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3767"><a class="md-toc-inner" href="#mvcc">MVCC</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3771"><a class="md-toc-inner" href="#实现方式">实现方式</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3787"><a class="md-toc-inner" href="#transaction">transaction</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3791"><a class="md-toc-inner" href="#一个账户向另外一个账户转账例子">一个账户向另外一个账户转账例子</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3800"><a class="md-toc-inner" href="#stm">stm</a></span><span role="listitem" class="md-toc-item md-toc-h3" data-ref="n3827"><a class="md-toc-inner" href="#执行stm">执行STM</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3862"><a class="md-toc-inner" href="#boltdb">boltDB</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3872"><a class="md-toc-inner" href="#线性一致性">线性一致性</a></span><span role="listitem" class="md-toc-item md-toc-h1" data-ref="n3924"><a class="md-toc-inner" href="#优化">优化</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3925"><a class="md-toc-inner" href="#multi-raft">multi-raft</a></span><span role="listitem" class="md-toc-item md-toc-h2" data-ref="n3950"><a class="md-toc-inner" href="#优化读性能性能">优化读性能性能</a></span></p></div><p><span>etcd 通过raft实现分布式一致性，实现参照raft的论文并做了很少的修改(优化), 本次文章整理raft的基本原理以及etcd的实现，raft具体实现可以参照论文翻译版</span><a href='https://www.infoq.cn/article/raft-paper/'><span>raft-中文</span></a></p><h1><a name="基本架构" class="md-header-anchor"></a><span>基本架构</span></h1><p><span>之前在网上看到一些关于etcd的架构，将raft等作为etcd的底层而storage作为了上层实现,但我习惯采用领域驱动的方式分析架构。raft和server是etcd的2个subdomain，而raft-http作为支撑模块其实可以分离出来，但是目前etcd是把它放在了server中的api中，这种设计如果考虑到修改网络层的设计可能需要修改server包，单独分离出来可能更合理。</span></p><p><span>首先看看etcd几个基本的组成部分：</span>
+<img src="https://upload-images.jianshu.io/upload_images/9243349-d3a5a1c4b81aa3c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="架构.png"></p><ul><li><p><span>httpserver</span>
+<span>etcd node之间进行通信，接收来自其他node的消息；</span></p></li><li><p><span>raft</span>
+<span>实现分布式一致性raft协议, raft模块与server模块的通信采用了四个channel：</span></p><ul><li><code>propc</code><span>： 处理client来的命令</span></li><li><code>recvc</code><span>： 处理http消息</span></li><li><code>readyc</code><span>: 消息经过raft处理之后封装成Ready交给server处理</span></li><li><code>advanceC</code><span>：server处理一条消息之后通知raft</span></li></ul></li><li><p><span>WAL</span>
+<span>server为了防止数据丢失而实现的write ahead log，与很多数据库的实现类似</span></p></li><li><p><span>snapshotter</span></p><p><span>防止wal的无限制增长，定期生成snap文件仅保留 term，index以及key value data；</span></p></li><li><p><span>mvcc</span></p><p><span>实现多版本的并发控制，使用revision（main和sub）来描述一个key的整个过程，从创建到删除。mvcc中还包含了watcher，用于实现监听key，prefix， range的变化。</span></p></li><li><p><span>backend &amp; boltdb</span></p><p><span>持久化key value到boltdb数据库</span></p></li><li><p><span>raftlog</span></p><p><span>raftlog模块包含unstable和raft的snapshot，unstable保存log entries，但是entries数量比较多的时候，就需要compact，创建一个snapshot，这里的snapshot还是保存在memory中的。raft模块会定时收集entries交给server处理。</span></p></li></ul><h2><a name="启动" class="md-header-anchor"></a><span>启动</span></h2><ol start='' ><li><span>checkSupportArch()</span></li><li><span>startEtcdOrProxyV2</span>
+<span>2.1 解析命令行输入  cfg.parse(os.Args[1:])</span>
+<span>2.2  startEtcd</span>
+<span>2.3 osutil.HandleInterrupts(lg)  注册信号，清理系统</span>
+<span>2.4 notifySystemd(lg)</span></li></ol><h3><a name="重点分析startetcd" class="md-header-anchor"></a><span>重点分析startEtcd</span></h3><ol start='' ><li><span>检查配置是否正确</span></li><li><span>创建一个etcd 实例</span></li><li><span>configurePeerListeners 为每个peer创建一个peerListener( rafthttp.NewListener)，用于接收peer的消息</span></li><li><strong><span>configureClientListeners 创建client的listener(transport.NewKeepAliveListener)后面分析用途</span></strong></li><li><span>创建一个etcdServer实例</span></li><li><span>启动etcdServer.Start()</span></li><li><span>配置peer handler</span></li></ol><p><img src="https://upload-images.jianshu.io/upload_images/9243349-ab58cc686462c9fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="startEtcd.png"></p><p><span>上图中的绿色加号表示一个单独的协程。</span></p><h1><a name="raft" class="md-header-anchor"></a><span>RAFT</span></h1><p><span>etcd实现了raft协议，raft论文的描述参照文章开头的链接。</span></p><h2><a name="角色" class="md-header-anchor"></a><span>角色</span></h2><ol start='' ><li><p><span>leader</span></p><ul><li><span>提交上一任期(term) leader的msg</span>
+<span>成为leader后发送一个空</span><code>entries</code><span>的msg到follower，让所有follower提交上一个</span><code>term</code><span>的msg；</span></li></ul><ul><li><span>保证读的一致性</span>
+<span>读请求默认发送到leader节点，收到请求之后确保自己仍然是当前系统的leader，判断的方法是根据heartbeat判断自己仍然能获取到大多数的follower的响应。</span></li><li><span>heartbeat time</span>
+<span>发送心跳，附带appendmsg</span>
+<span> 收到resp检查是否符合大多数，提交log entry</span></li><li><span>election time</span>
+<span>这个时间还在使用，每隔这个时间就发送消息</span><code>pb.MsgCheckQuorum</code><span> 检查是否能连上所有的follower</span></li></ul></li><li><p><span>preCandidate</span></p><p><span>follower切换成为candidate之后会增加系统的term，但如果该节点无法联系上系统中的大多数节点那么这次状态切换会导致term毫无意义的增大。因此在转换为candidate之前，需要发送prevote消息，消息中带有index和term，用于跟follower比较，确保entry够新；发送这个消息并且获取足够的响应才能成为candidate。</span></p></li><li><p><span>candidate</span>
+<span>收到MsgApp,heartbeat,snap消息则退回follower状态；若收到MsgPreVoteResp,则检查投票情况，超过半数成为leader</span></p></li><li><p><span>follower</span></p><p><span>follower主要职责：</span></p><ul><li><span>follower可以proxy的模式下工作，将收到的client请求route到leader。</span></li><li><span>收到prevote消息，判断是否在leader lease内；如果自己还能收到leader的消息，拒绝投票。</span></li><li><span>收到vote 消息则重置自己的election timer避免自己超时成为candidate 避免无谓的竞争。</span></li><li><span>处理heartbeat更新commitIndex并重置election timer，超时则切换为precandidate</span></li><li><span>处理msgApp消息，追加日志。</span></li></ul></li></ol><h1><a name="网络http" class="md-header-anchor"></a><span>网络http</span></h1><p><span>raft模块仅实现raft协议相关的逻辑，网络发送交给server raftnode来完成，etcd将 网络实现放在server的api包中，实际上这部分在etcd中并不属于核心域的内容，将其单独放入一个包也是可以的，也更容易实现网络层的替换。</span></p><p><span>etcd提供了2个消息发送的通道，</span><strong><span>stream和pipeline</span></strong></p><ul><li><p><span>stream</span></p><p><span>维护一个http的长连接，用于发送heartbeat,msgVote等发送频次高，包比较小的消息。streamRoundTripper设置默认的读写超时，因为读写包的size比较小；</span></p></li><li><p><span>pipeline</span></p><p><span>用于发送snapshot等包比较大，但是频次比较低的消息。pipelineRoundTripper设置默认读写超时为0即不超时，因为读写snapshotter耗时较长。</span></p></li></ul><p>&nbsp;</p><p><img src="https://upload-images.jianshu.io/upload_images/9243349-9007d14d4e3070fc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="raft-http.png"></p><ul><li><p><span>pipelineHandler</span></p><p><span>实现serveHttp方法，http的handler</span></p></li><li><p><span>streamHandler</span></p><p><span>实现serveHttp方法，http的handler</span></p></li><li><p><span>streamReader</span></p><p><span>streamReader start方法将启动一个run协程，该协程decode 消息，并把消息放入recvC channel中。</span></p></li><li><p><span>streamwriter</span></p><p><span>单独启动了一个协程run(),主要完成下面的事情</span></p><ol start='' ><li><span>当其他的peer主动与当前的节点连接，peer就会将连接写入writerstream的connc，在streamwriter的run协程中获取这个连接并进行绑定。</span></li><li><span>定时发送心跳消息msgHeartbeat，由定时器触发</span></li><li><span>发送其他的消息</span></li></ol></li><li><p><span>pipline</span></p><p><span>发送snapshotmsg</span></p></li><li><p><span>streamRoundTripper</span></p><p><span>配置read write的timeout为5s</span></p></li></ul><h2><a name="发送流程" class="md-header-anchor"></a><span>发送流程</span></h2><p><span>以发送一个MsgApp消息为例来看系统发送消息流程：</span></p><p><img src="https://upload-images.jianshu.io/upload_images/9243349-6064b902b171cb1d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="stream.png" style="zoom:80%;" /></p><ul><li><span>raft模块处理log entry之后封装成ready写入readyC channel中</span></li><li><span>server模块从channel中取出ready实例，调用rafthttp tranport发送消息。</span></li><li><span>peer会根据消息的类型决定使用</span><code>streamwriter</code><span>还是</span><code>pipeline</code><span>来发送当前的消息，由于我们示例中使用了MsgApp因此最终写入streamwriter的</span><code>writec</code><span> channel中。</span></li><li><span>streamWriter的run协程从中读出消息，</span><strong><span>调用</span><code>http.Flusher</code><span> 发送序列化后的消息</span></strong><span>。</span></li></ul><blockquote><p><span>Go 的 http.Flusher 常用于文件上传/下载/内容预处理等流式IO</span></p></blockquote><h1><a name="数据流" class="md-header-anchor"></a><span>数据流</span></h1><h2><a name="client-put" class="md-header-anchor"></a><span>client Put</span></h2><p><img src="https://upload-images.jianshu.io/upload_images/9243349-9230baf940a5a422.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="数据流.png"></p><ol start='' ><li><span>client 通过 grpc 发送一个 Put kv request，etcd server 的 rpc server 收到这个请求，client调用node的Propose接口创建一个</span><code>Propose</code><span>实例并放入 node 模块的</span><code>ProposeC</code><span> channel。</span></li><li><span>node 模块 run goroutine 监听在 propc Channel 中，收到 MsgProp Msg 之后，通过</span><code>raft.Step(Msg)</code><span>接口将其提交给 raft StateMachine 处理；</span></li><li><span>raft StateMachine 处理完这个 MsgProp Msg 会产生 1 个 Op log entry 和 2 个发送给另外两个副本的 </span><code>Append entries</code><span> 的 </span><code>MsgApp</code><span> messages，node 模块会将这两个输出打包成 </span><code>Ready</code><span>，然后通过 readyc Channel 传递给 raftNode 模块的 coroutine；</span></li><li><span>raftNode 模块的 coroutine 通过 readyc 读取到 Ready，首先通过网络层将 2 个 append entries 的 messages 发送给两个副本(PS:这里是异步发送的)；</span></li><li><span>raftNode 模块的 coroutine 自己将 Op log entry 通过持久化层的 WAL 接口同步的写入 WAL 文件中</span></li><li><span>raftNode 模块的 coroutine 通过 advancec Channel 通知当前 Ready 已经处理完，请给我准备下一个 带出的 raft StateMachine 输出Ready；</span></li><li><span>其他副本的返回 Append entries 的 response： </span><code>MsgAppResp</code><span> message，会通过 node 模块的接口经过 </span><code>recvc</code><span> Channel 提交给 node 模块的 coroutine；</span></li><li><span>node 模块 coroutine 从 </span><code>recvc</code><span> Channel 读取到 MsgAppResp，然后提交给 raft StateMachine 处理。node 模块 coroutine 会驱动 raft StateMachine 得到关于这个 </span><code>committedEntires</code><span>，也就是一旦大多数副本返回了就可以 commit 了，node 模块 new 一个新的 Ready其包含了 </span><code>committedEntries</code><span>，通过 </span><code>readyc</code><span> Channel 传递给 raftNode 模块 coroutine 处理；</span></li><li><span>raftNode 模块 coroutine 从 readyc Channel 中读取 Ready结构</span></li><li><span>取出已经 commit 的 committedEntries 通过 </span><code>applyc</code><span> 传递给另外一个 etcd server coroutine 处理，其会将每个</span><code>apply</code><span> 任务提交给 FIFOScheduler 调度异步处理，这个调度器可以保证 </span><code>apply</code><span> 任务按照顺序被执行，因为 </span><code>apply</code><span> 的执行是不能乱的；</span></li><li><span>raftNode 模块的 coroutine 通过 </span><code>advancec</code><span> Channel 通知当前 Ready 已经处理完，请给我准备下一个待处理的 raft StateMachine 输出Ready；</span></li><li><span>FIFOScheduler 调度执行 apply 已经提交的 </span><code>committedEntries</code></li><li><span>AppliedIndex 推进，通知 ReadLoop coroutine，满足 </span><code>applied index&gt;= commit index</code><span> 的 read request 可以返回；</span></li><li><span>server调用网络层接口返回 client 成功。</span></li></ol><h1><a name="wal" class="md-header-anchor"></a><span>WAL</span></h1><p><img src="https://upload-images.jianshu.io/upload_images/9243349-951ee8b13b24f72c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="wal.png"></p><p><span>首先参照上图回顾一下简单的请求提交流程：</span></p><ol start='' ><li><span>当etcd收到client的请求之后，请求中封装Entry交给raft模块处理，raft模块将</span><code>entry</code><span>保存到</span><code>raftlog</code><span>的</span><code>unstable</code><span>中；</span></li><li><span>raft模块封装entry成为一个</span><code>ready</code><span>实例，并放入</span><code>readyC</code><span> channel中等待server处理</span></li><li><span>server收到持久化的entry(pb序列化)，写入WAL（发送到其他的etcd节点）</span></li><li><span>让raft模块把entry从</span><code>unstable</code><span>移动到</span><code>storage</code><span>中保存</span></li><li><span>收到半数以上节点响应，leader节点认为该entry应该被commit，封装到ready实例返回给server；</span></li><li><span>server把ready实例中的entry记录应用到状态机中。</span></li></ol><h2><a name="wal-n3727" class="md-header-anchor"></a><span>wal</span></h2><p><span>wal文件中的记录是Record，通过pb序列化之后保存，包含三个字段</span></p><ul><li><span>type: record的类型 </span><code>metaType</code><span>，</span><code>entryType</code><span>, </span><code>stateType</code><span>, </span><code>crcType</code><span> snapshotType(快照数据相关信息，不是完整的快照)</span></li><li><span>Crc: 数据校验</span></li><li><span>Data：type指定类型的数据</span></li></ul><blockquote><p><span>wal 文件中的snapshot类型只包含 Index，Term(任期)</span></p></blockquote><p><span>文件组织：</span></p><p><span>wal中有一个dir字段定义wal文件的目录，目录中存放wal文件，每个文件大小是64MB，metadata是第一个record块，创建的时候首先创建一个tmp文件，待完成之后重命名为wal文件格式，类似原子操作这种实现方式以后可以借鉴。</span></p><p><img src="https://upload-images.jianshu.io/upload_images/9243349-84f81c71d420bc3b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer"></p><p><span>文件命名方式： 序号-起始的record id.wal</span></p><h3><a name="读取" class="md-header-anchor"></a><span>读取</span></h3><p><span>系统启动的时候会读取wal中的记录用于恢复系统数据和状态；每次读取都会指定index，不是每次从第一个日志文件开始，因此在文件打开的时候就需要searchIndex，</span></p><p><span>当open创建wal实例之后就能通过ReadAll方法读取日志，读取之后根据类型解析出entry，注意的是读取wal中切换文件是在decoder里面做的，这个实现有点奇怪。</span></p><h3><a name="追加" class="md-header-anchor"></a><span>追加</span></h3><p><span>消息经过raft模块处理之后封装成ready，raftnode取出ready 然后调用storage的Save接口存储entries。</span></p><p><span>wal将消息entry序列化并封装成record实例，并完成编码，crc校验，8字节对齐等然后写入PageWriter，PageWriter是带有缓冲区的writer，每当写满一个page（walPageBytes）就会触发一次flush操作。</span></p><h3><a name="切换" class="md-header-anchor"></a><span>切换</span></h3><p><span>当wal文件大小超过64MB时，就会触发日志文件的切换。</span></p><p><span>通过filePipeline获取一个新建临时文件，首先写入crc(上一个wal文件最后的crc) meta,state日志记录，然后重命名wal文件，重命名之后，调用fsync(fdatasync只能保存数据)确保重命名写入磁盘inode。保存offset，然后重新打开文件，直接定位到offset的位置。</span></p><h2><a name="snapshotter" class="md-header-anchor"></a><span>snapshotter</span></h2><p><span>wal文件是只追加不删除的，因此随着系统数据增多，wal文件会变得越来越多(因为切割成64MB的文件)，文件中可能存在很多重复或者已经删除的record数据。snapshotter是根据apply数量的创建，超过一定阈值就会触发创建snapshot。</span><code>ep.appliedi-ep.snapi &lt;= s.Cfg.SnapshotCount</code><span>,合并wal并写入磁盘，减少了wal文件占用的磁盘空间。当etcd重启的时候先从snapshotter恢复，之后的数据再从wal文件中恢复，这样能提高系统的恢复速度。</span></p><p><span>比如当前etcd中有三个WAL文件，可以从这些文件的文件名知道其中存放数据的索引范围。</span><code>0000000000000001-0000000000000000.wal</code><span>，</span><code>0000000000000002-0000000000001000.wal</code><span>，</span><code>0000000000000003-0000000000002000.wal</code><span>。经过一次snapshot生成之后wal文件修改为</span><code>0000000000000001-0000000000002000.wal</code><span>，snapshot文件为</span><code>0000000000000001-0000000000001fff.snap</code></p><h1><a name="storage" class="md-header-anchor"></a><span>Storage</span></h1><ul><li><p><span>backend</span></p><p><span>backend 封装了boltdb存储的接口</span></p></li><li><p><span>watch</span></p></li></ul><blockquote><p><span>快慢和通知失败的情况</span></p></blockquote><p><span>   watch是通过watchableStore实现的，每次在保存数据的时候，都会调用notify，通知到watchServer，watchserver进行过滤放入watchstream中，这里有一个实现的点需要注意，就是需要解决</span><strong><span>快慢和发送通知失败</span></strong><span>的情况；</span>
+<strong><span>etcd的解决这个问题的办法，使用了victim队列 unsynced</span></strong>
+<span>当synced队列发送失败就放入victims 同时将watcher移除，这样防止其阻塞了其他的watcher的通知，启用一个单独协程处理victims中的消息。</span></p><blockquote><p><span>watch 一个prefix或者范围的情况</span></p></blockquote><p><span>通过一个adt.IntervalTree实现了一个范围的监控，adt.IntervalTree本质上是一个红黑树，将一个区间划分成一些单元区间，每个区间都对了应线段树的一个叶节点。</span></p><h1><a name="mvcc" class="md-header-anchor"></a><span>MVCC</span></h1><p><span>etcd并没有直接保存用于输入的key，而是生成了一个revision表示当前的key，通过revision获取value，这样实现了多版本的控制。</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="go"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="go"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">type</span> <span class="cm-variable">revision</span> <span class="cm-keyword">struct</span> {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-comment">// 事务id</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-variable">main</span> <span class="cm-keyword">int64</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> <span class="cm-tab" role="presentation" cm-text="	"> </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// 修改的id</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;<span class="cm-variable">sub</span> <span class="cm-keyword">int64</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 144px;"></div><div class="CodeMirror-gutters" style="display: none; height: 144px;"></div></div></div></pre><p><span>这里的 main 属性对应事务 ID，全局递增不重复，可以看做一个逻辑时钟。sub 代表一次事务中不同的修改操作（如put和delete）编号，从0开始依次递增。所以在一次事务中，每一个修改操作所绑定的</span><code>revision</code><span>依次为</span><code>{txID, 0}</code><span>, </span><code>{txID, 1}</code><span>, </span><code>{txID, 2}</code><span>…</span></p><h2><a name="实现方式" class="md-header-anchor"></a><span>实现方式</span></h2><p>&nbsp;</p><p><img src="https://upload-images.jianshu.io/upload_images/9243349-3291b49273c70146.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="etcdmvccclass.png"></p><ul><li><span>store: mvcc的接口用于raft模块的存储</span></li><li><span>backend: 封装了boltdb的存储接口</span></li><li><span>treeindex：系统保存的是revision，但是用户查找是根据key获取value，因此需要一个映射关系，treeindex就是这样的一个b+tree，放入内存作为revision到key的映射</span></li><li><span>keyindex: 封装了revision和generation</span></li><li><span>generation：记录key从诞生到tomstone(删除)整个变化过程。由于key可能被创建，修改删除再创建这个反复过程因此generation是一个数组。</span></li></ul><p><img src="https://upload-images.jianshu.io/upload_images/9243349-e8d5265fb8a9fdc9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="etcdmvcc.png"></p><p><span>上面这个图描述的是从一个key到kv对的的映射过程。</span></p><h2><a name="transaction" class="md-header-anchor"></a><span>transaction</span></h2><p><span>etcd 提供了一种事务机制一次执行多个key value操作.</span></p><p><code>Txn().If(cond1, cond2, ...).Then(op1, op2, ...,).Else(op1, op2)</code></p><p><span>但是基于上述操作执行一个事务操作也比较麻烦，etcd还提供了一个更方便的操作接口STM() software transactional memory) 事务实现。</span></p><h3><a name="一个账户向另外一个账户转账例子" class="md-header-anchor"></a><span>一个账户向另外一个账户转账例子</span></h3><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="go" style="break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="go"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><span><span>​</span>x</span></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// 创建一个client</span></span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">cli</span>, <span class="cm-variable">err</span> :<span class="cm-operator">=</span> <span class="cm-variable">clientv3</span><span class="cm-number">.</span><span class="cm-variable">New</span>(<span class="cm-variable">clientv3</span><span class="cm-number">.</span><span class="cm-variable">Config</span>{<span class="cm-variable">Endpoints</span>: <span class="cm-variable">endpoints</span>})</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">if</span> <span class="cm-variable">err</span> <span class="cm-operator">!=</span> <span class="cm-atom">nil</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">log</span><span class="cm-number">.</span><span class="cm-variable">Fatal</span>(<span class="cm-variable">err</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span>}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">defer</span> <span class="cm-variable">cli</span><span class="cm-number">.</span><span class="cm-variable">Close</span>()</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">totalAccounts</span> :<span class="cm-operator">=</span> <span class="cm-number">5</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// 准备数据创建一些kv revision</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">for</span> <span class="cm-variable">i</span> :<span class="cm-operator">=</span> <span class="cm-number">0</span>; <span class="cm-variable">i</span> <span class="cm-operator">&lt;</span> <span class="cm-variable">totalAccounts</span>; <span class="cm-variable">i</span><span class="cm-operator">++</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">k</span> :<span class="cm-operator">=</span> <span class="cm-variable">fmt</span><span class="cm-number">.</span><span class="cm-variable">Sprintf</span>(<span class="cm-string">"accts/%d"</span>, <span class="cm-variable">i</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">if</span> <span class="cm-variable">_</span>, <span class="cm-variable">err</span> <span class="cm-operator">=</span> <span class="cm-variable">cli</span><span class="cm-number">.</span><span class="cm-variable">Put</span>(<span class="cm-variable">context</span><span class="cm-number">.</span><span class="cm-variable">TODO</span>(), <span class="cm-variable">k</span>, <span class="cm-string">"100"</span>); <span class="cm-variable">err</span> <span class="cm-operator">!=</span> <span class="cm-atom">nil</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">log</span><span class="cm-number">.</span><span class="cm-variable">Fatal</span>(<span class="cm-variable">err</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span>}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span>}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">//创建一个transaction的执行函数</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">exchange</span> :<span class="cm-operator">=</span> <span class="cm-keyword">func</span>(<span class="cm-variable">stm</span> <span class="cm-variable">concurrency</span><span class="cm-number">.</span><span class="cm-variable">STM</span>) <span class="cm-keyword">error</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">from</span>, <span class="cm-variable">to</span> :<span class="cm-operator">=</span> <span class="cm-number">2</span>, <span class="cm-number">3</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">if</span> <span class="cm-variable">from</span> <span class="cm-operator">==</span> <span class="cm-variable">to</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// nothing to do</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">return</span> <span class="cm-atom">nil</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span>}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// read values</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">fromK</span>, <span class="cm-variable">toK</span> :<span class="cm-operator">=</span> <span class="cm-variable">fmt</span><span class="cm-number">.</span><span class="cm-variable">Sprintf</span>(<span class="cm-string">"accts/%d"</span>, <span class="cm-variable">from</span>), <span class="cm-variable">fmt</span><span class="cm-number">.</span><span class="cm-variable">Sprintf</span>(<span class="cm-string">"accts/%d"</span>, <span class="cm-variable">to</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">fromV</span>, <span class="cm-variable">toV</span> :<span class="cm-operator">=</span> <span class="cm-variable">stm</span><span class="cm-number">.</span><span class="cm-variable">Get</span>(<span class="cm-variable">fromK</span>), <span class="cm-variable">stm</span><span class="cm-number">.</span><span class="cm-variable">Get</span>(<span class="cm-variable">toK</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">fromInt</span>, <span class="cm-variable">toInt</span> :<span class="cm-operator">=</span> <span class="cm-number">10</span>, <span class="cm-number">20</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">log</span><span class="cm-number">.</span><span class="cm-variable">Printf</span>(<span class="cm-string">"fromV %s,toV %s\n"</span>, <span class="cm-variable">fromV</span>, <span class="cm-variable">toV</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// 转账逻辑 transfer</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">xfer</span> :<span class="cm-operator">=</span> <span class="cm-variable">fromInt</span> <span class="cm-operator">/</span> <span class="cm-number">2</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">fromInt</span>, <span class="cm-variable">toInt</span> <span class="cm-operator">=</span> <span class="cm-variable">fromInt</span><span class="cm-operator">-</span><span class="cm-variable">xfer</span>, <span class="cm-variable">toInt</span><span class="cm-operator">+</span><span class="cm-variable">xfer</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="">​</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// 写入</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">stm</span><span class="cm-number">.</span><span class="cm-variable">Put</span>(<span class="cm-variable">fromK</span>, <span class="cm-variable">fmt</span><span class="cm-number">.</span><span class="cm-variable">Sprintf</span>(<span class="cm-string">"%d"</span>, <span class="cm-variable">fromInt</span>))</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">stm</span><span class="cm-number">.</span><span class="cm-variable">Put</span>(<span class="cm-variable">toK</span>, <span class="cm-variable">fmt</span><span class="cm-number">.</span><span class="cm-variable">Sprintf</span>(<span class="cm-string">"%d"</span>, <span class="cm-variable">toInt</span>))</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-keyword">return</span> <span class="cm-atom">nil</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span>}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">//执行交易，exchange为</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">resp</span>, <span class="cm-variable">err</span> :<span class="cm-operator">=</span> <span class="cm-variable">concurrency</span><span class="cm-number">.</span><span class="cm-variable">NewSTM</span>(<span class="cm-variable">cli</span>, <span class="cm-variable">exchange</span>, )</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 936px;"></div><div class="CodeMirror-gutters" style="display: none; height: 936px;"></div></div></div></pre><p><span>分析一下上述代码的执行流程：</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="go" style="break-inside: unset;"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="go"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">func</span> <span class="cm-variable">NewSTM</span>(<span class="cm-variable">c</span> <span class="cm-operator">*</span><span class="cm-variable">v3</span><span class="cm-number">.</span><span class="cm-variable">Client</span>, <span class="cm-variable">apply</span> <span class="cm-keyword">func</span>(<span class="cm-variable">STM</span>) <span class="cm-keyword">error</span>, <span class="cm-variable">so</span> <span class="cm-number">...</span><span class="cm-variable">stmOption</span>) (<span class="cm-operator">*</span><span class="cm-variable">v3</span><span class="cm-number">.</span><span class="cm-variable">TxnResponse</span>, <span class="cm-keyword">error</span>) {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; <span class="cm-variable">opts</span> :<span class="cm-operator">=</span> <span class="cm-operator">&amp;</span><span class="cm-variable">stmOptions</span>{<span class="cm-variable">ctx</span>: <span class="cm-variable">c</span><span class="cm-number">.</span><span class="cm-variable">Ctx</span>()}</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; <span class="cm-keyword">for</span> <span class="cm-variable">_</span>, <span class="cm-variable">f</span> :<span class="cm-operator">=</span> <span class="cm-keyword">range</span> <span class="cm-variable">so</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-variable">f</span>(<span class="cm-variable">opts</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; <span class="cm-keyword">if</span> <span class="cm-atom">len</span>(<span class="cm-variable">opts</span><span class="cm-number">.</span><span class="cm-variable">prefetch</span>) <span class="cm-operator">!=</span> <span class="cm-number">0</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-variable">f</span> :<span class="cm-operator">=</span> <span class="cm-variable">apply</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;<span class="cm-variable">apply</span> <span class="cm-operator">=</span> <span class="cm-keyword">func</span>(<span class="cm-variable">s</span> <span class="cm-variable">STM</span>) <span class="cm-keyword">error</span> {</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; <span class="cm-variable">s</span><span class="cm-number">.</span><span class="cm-variable">Get</span>(<span class="cm-variable">opts</span><span class="cm-number">.</span><span class="cm-variable">prefetch</span><span class="cm-number">...</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; <span class="cm-keyword">return</span> <span class="cm-variable">f</span>(<span class="cm-variable">s</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp;  }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; }</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; <span class="cm-keyword">return</span> <span class="cm-variable">runSTM</span>(<span class="cm-variable">mkSTM</span>(<span class="cm-variable">c</span>, <span class="cm-variable">opts</span>), <span class="cm-variable">apply</span>)</span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 360px;"></div><div class="CodeMirror-gutters" style="display: none; height: 360px;"></div></div></div></pre><ol start='' ><li><span>创建一个stm</span></li><li><span>执行stm</span></li></ol><h3><a name="stm" class="md-header-anchor"></a><span>stm</span></h3><p><span>etcd STM提供了四种事务级别：</span></p><ul><li><p><strong><span>SerializableSnapshot</span></strong></p><p><span>可序列化的隔离，并且做写的冲突检查，默认就是采用这种隔离级别</span></p></li><li><p><span>Serializable</span></p><p><span>第一次读的revision数据</span></p></li><li><p><span>RepeatableReads</span></p><p><span>同一个transaction中保证数据不变</span></p></li><li><p><span>ReadCommitted</span></p><p><span>读已提交数据</span></p></li></ul><p><span>STM的事务级别通过stmOption指定，默认就是</span><code>SerializableSnapshot</code><span>。根据事务的隔离级别不同创建两种不同的stm实例和设置stm的conflicts，定义如下</span></p><ul><li><p><span>stmSerializable</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="go"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="go"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">type</span> <span class="cm-variable">stmSerializable</span> <span class="cm-keyword">struct</span> {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">stm</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">prefetch</span> <span class="cm-keyword">map</span>[<span class="cm-keyword">string</span>]<span class="cm-operator">*</span><span class="cm-variable">v3</span><span class="cm-number">.</span><span class="cm-variable">GetResponse</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 96px;"></div><div class="CodeMirror-gutters" style="display: none; height: 96px;"></div></div></div></pre></li><li><p><span>stm</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="go"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="go"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">type</span> <span class="cm-variable">stm</span> <span class="cm-keyword">struct</span> {</span></pre></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">client</span> <span class="cm-operator">*</span><span class="cm-variable">v3</span><span class="cm-number">.</span><span class="cm-variable">Client</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">ctx</span> &nbsp; &nbsp;<span class="cm-variable">context</span><span class="cm-number">.</span><span class="cm-variable">Context</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// rset holds read key values and revisions</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">rset</span> <span class="cm-variable">readSet</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// wset holds overwritten keys and their values</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">wset</span> <span class="cm-variable">writeSet</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// getOpts are the opts used for gets</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">getOpts</span> []<span class="cm-variable">v3</span><span class="cm-number">.</span><span class="cm-variable">OpOption</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-comment">// conflicts computes the current conflicts on the txn</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-tab" role="presentation" cm-text="	">  </span><span class="cm-variable">conflicts</span> <span class="cm-keyword">func</span>() []<span class="cm-variable">v3</span><span class="cm-number">.</span><span class="cm-variable">Cmp</span></span></pre><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 288px;"></div><div class="CodeMirror-gutters" style="display: none; height: 288px;"></div></div></div></pre><p>&nbsp;</p></li><li><p><span>OpOption</span></p><pre spellcheck="false" class="md-fences md-end-block ty-contain-cm modeLoaded" lang="go"><div class="CodeMirror cm-s-inner CodeMirror-wrap" lang="go"><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 0px; left: 4px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 0px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation"><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: 0px; width: 0px;"></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span class="cm-keyword">type</span> <span class="cm-variable">OpOption</span> <span class="cm-keyword">func</span>(<span class="cm-operator">*</span><span class="cm-variable">Op</span>)</span></pre></div></div></div></div></div></div><div style="position: absolute; height: 0px; width: 1px; border-bottom-width: 0px; border-bottom-style: solid; border-bottom-color: transparent; top: 24px;"></div><div class="CodeMirror-gutters" style="display: none; height: 24px;"></div></div></div></pre></li></ul><h3><a name="执行stm" class="md-header-anchor"></a><span>执行STM</span></h3><p><code>runstm</code><span>主要是循环执行(重试)以下三个步骤：</span></p><ol start='' ><li><span>重置stm，清空STM的读写缓存</span></li><li><span>执行事务操作，apply函数</span></li><li><span>提交事务</span></li></ol><p><span>最终的commit执行 etcd client的transaction, </span><code>txn := s.client.Txn(s.ctx).If(s.conflicts()...).Then(s.wset.puts()...)</code><span> </span><code>conflict</code><span>函数是根据隔离级别定义的。</span></p><ol start='' ><li><p><span>readCommited: 不做冲突检测</span></p></li><li><p><span>repeatableRead：</span></p><ol start='' ><li><span>首先从读缓存中读，读缓存没有则从etcdserver中获取保证了事务过程中的可重复读。</span></li><li><span>用</span><code>readSet</code><span>数据的</span><code>ModRevision</code><span>做冲突检测，确保本事务读到的数据都是最新的。</span></li></ol></li><li><p><span>serializable</span></p><ol start='' ><li><span>第一次read的时需要保存key的revision，保证后面提交时候没有发生变化。</span></li><li><span>用</span><code>readSet</code><span>数据的</span><code>ModRevision</code><span>做冲突检测，确保本事务读到的数据都是最新的</span></li></ol></li><li><p><span>SerializableSnapshot</span></p><ol start='' ><li><span>第一次read的时需要保存key的revision，保证后面提交时候没有发生变化。</span></li><li><span>写冲突检查，读冲突检查都做。</span></li></ol></li></ol><h1><a name="boltdb" class="md-header-anchor"></a><span>boltDB</span></h1><p><span>boltdb是一个kv存储的嵌入式数据库，核心代码只有2000行左右；</span></p><ul><li><span>将数据库文件使用mmap映射到内存中</span></li><li><span>每次开始写事务的时候会把整个页面重新分配（不会修改原页面）写入硬盘，这种方式不会影响正在进行的读事务。</span></li><li><span>bolt只支持并发的读和独占的写；通过两个交替的</span><code>metablock</code><span>和每次写事务重新分配页面的方式实现了mvcc；</span></li></ul><p><span>后面会单独开启一个topic讲解boltdb存储引擎的实现。</span></p><h1><a name="线性一致性" class="md-header-anchor"></a><span>线性一致性</span></h1><p><span>raft的目标是实现线性一致性，定义如下：</span></p><p><img src="https://upload-images.jianshu.io/upload_images/9243349-e61a695edd57d488.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="linearizability-complete-visibility.jpg"></p><ul><li><span>invocation: 操作发起的时间；</span></li><li><span>completion: 操作完成的时间。</span></li></ul><blockquote><p><strong><span>each operation appears to take effect atomically at some point between its invocation and completion</span></strong><span>.</span></p></blockquote><p><span>一致性的相关文件请 参照</span><a href='https://aphyr.com/posts/313-strong-consistency-models'><span>Strong consistency models</span></a></p><p><span>etcd读一致性的含义：</span></p><ol start='' ><li><p><span>保证处理读请求的是当前系统的leader，如果发生了脑裂，有了另外一个leader，就会导致stale read</span></p></li><li><p><span>确保读到的数据能反映读请求 </span><code>invoke</code><span> 时的状态，或更新的状态。</span></p><blockquote><p><span>Once an operation is complete, </span><em><span>everyone</span></em><span> must see it–or some later state.</span></p></blockquote></li></ol><p><span>etcd实现读一致性的方法:</span></p><ul><li><p><span>readIndex</span></p><p><img src="https://upload-images.jianshu.io/upload_images/9243349-11cd8319aac7ae36.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" referrerpolicy="no-referrer" alt="etcdctl-range.png"></p><ol start='' ><li><span>leader是否在当前的term提交过</span><code>log entry</code><span> 如果未提交过则直接报错返回，因为新的leader必须提交之前</span><code>term</code><span>的未提交的的</span><code>log entry</code></li><li><span>保存收到消息时的</span><code>committed index</code><span>，这就是</span><code>readIndex</code><span>。</span><code>readIndex是保证线性一致性的最小的</code><span>commit index`</span></li><li><span>leader发送一轮心跳，确保自己仍然能获取大多数follower的响应。</span></li><li><span>等待apply index大于等于commit index（apply到状态机）说明状态机</span><strong><span>至少</span></strong><span>应用到 ReadIndex 记录的 Log</span></li><li><span>信号返回给读协程</span></li><li><span>读协程从kv中获取值</span></li></ol></li><li><p><span>read lease</span></p><p><span>使用 </span><code>ReadIndex</code><span> 避免了 </span><code>log replication</code><span>，但是仍需要发送 </span><code>heartbeat</code><span> 来确保 </span><code>leadership</code><span> 的有效性。</span><code>Lease read</code><span> 通过 </span><code>lease</code><span> 机制可以避免 </span><code>heartbeat</code><span> 的开销，直接返回结果，但这种方式依赖时钟，不能保证线性一致性。</span></p><p><code>raft-thesis</code><span> 中做法如下:</span></p><ul><li><code>leader</code><span> 通过 </span><code>heartbeat</code><span> 来保持 </span><code>lease</code><span>: 记录下发送 </span><code>heartbeat</code><span> 的时间 </span><code>start</code><span>，当收到多数派的响应后，就认为 </span><code>lease</code><span> 的有效期延续到 </span><code>start + election timeout / clock drift bound</code><span>， 在这个时间范围内不会产生新的 </span><code>leader</code><span>。</span></li><li><span>在 </span><code>lease</code><span> 期限的读请求不用和其他节点通信，直接认为当前 </span><code>leadership</code><span> 是有效的，只是绕过了 </span><code>heartbeat</code><span> 来确认 </span><code>leadetship</code><span> 有效性，其余的处理和 </span><code>ReadIndex</code><span> 相同。</span></li><li><span>要注意 </span><code>leadership transfer</code><span> 会导致新 </span><code>leader</code><span> 更早的产生，需要终止 </span><code>lease</code><span>。</span></li></ul><p><span>这种机制只能保证收到了 </span><code>heartbeat</code><span> 的节点不会发起选举。</span></p></li><li><p><span>wait Free</span></p><p><span>省去等待apply。这样的 LeaseRead 在收到请求后会立刻进行读请求，不取 commit index 也不等状态机。由于 Raft 的强 Leader 特性，在租期内的 Client 收到的 Resp 由 Leader 的状态机产生，所以只要状态机满足线性一致，那么在 Lease 内，不管何时发生读都能满足线性一致性。有一点需要注意，只有在 Leader 的状态机应用了当前 term 的第一个 Log 后才能进行 LeaseRead。因为新选举产生的 Leader，它虽然有全部 committed Log，但它的状态机可能落后于之前的 Leader，状态机应用到当前 term 的 Log 就保证了新 Leader 的状态机一定新于旧 Leader，之后肯定不会出现 stale read。</span></p></li></ul><h1><a name="优化" class="md-header-anchor"></a><span>优化</span></h1><h2><a name="multi-raft" class="md-header-anchor"></a><span>multi-raft</span></h2><p><span>单个raft存在kv场景中存在一定的局限性：</span></p><ol start='' ><li><span>系统的存储容量受制于单机的存储容量（使用分布式存储除外）</span></li><li><span>系统的性能受制于单机的性能（读写请求都由Leader节点处理）</span></li></ol><p><span>而在实际应用中通常把数据分区，每个区数据都有自己的副本，副本之间通过raft保证数据的一致性。定义如下：</span></p><blockquote><p><span>the data is divided into </span><em><span>ranges</span></em><span>, each with its own consensus group. This means that each node may be participating in hundreds of thousands of consensus groups. This presents some unique challenges, which we have addressed by introducing a layer on top of Raft that we call </span><a href='https://link.zhihu.com/?target=https%3A//github.com/cockroachdb/cockroach/tree/master/multiraft'><span>MultiRaft</span></a><span>.</span></p></blockquote><p><span>muti-raft实现的困难：</span></p><ol start='' ><li><span>数据何如分片</span></li><li><span>分片中的数据越来越大，需要分裂产生更多的分片，组成更多Raft-Group</span></li><li><span>分片的调度，让负载在系统中更平均（分片副本的迁移，补全，Leader切换等等）</span></li><li><span>一个节点上，所有的Raft-Group复用链接（否则Raft副本之间两两建链，链接爆炸了）</span></li><li><span>如何处理stale的请求（例如Proposal和Apply的时候，当前的副本不是Leader、分裂了、被销毁了等等）</span></li><li><span>Snapshot如何管理（限制Snapshot，避免带宽、CPU、IO资源被过度占用）</span></li></ol><p><span>具体可以参照tidb和cockroach的实现。</span></p><h2><a name="优化读性能性能" class="md-header-anchor"></a><span>优化读性能性能</span></h2><ul><li><span>Lease holder</span>
+<span>cockroach 增加了一个 lease holder角色来 就能保证线性一致性，不需要 ReadIndex 的 heartbeat，也不会像 lease read 损失一致性。</span></li><li><span>Quorum read</span>
+<span>Raft 的读虽然可以发送给 follower，但还是要从 leader 获取 readIndex，leader 的压力会很大。使用 quorum read 可以利用 follower 读，减小 leader 的压力， 提高读的吞吐量和性能: Improving Read Scalability in Raft-like consensus protocols</span></li></ul><p>&nbsp;</p><p><strong><span>参考</span></strong></p><p><a href='https://pingcap.com/blog-cn/linearizability-and-raft/'><span>线性一致性和raft</span></a></p><p><a href='https://www.usenix.org/system/files/conference/hotcloud17/hotcloud17-paper-arora.pdf'><span>Improving Read Scalability in Raft-like consensus protocols</span></a></p><p><a href='https://coreos.com/blog/transactional-memory-with-etcd3.html'><span>Serializability and Distributed Software Transactional Memory with etcd3</span></a></p><p><a href=' https://www.cockroachlabs.com/'><span>CockroachDB</span></a></p><p><a href='https://zhuanlan.zhihu.com/p/33047950'><span>Elasticell-Multi-Raft实现</span></a></p><p><a href='https://youjiali1995.github.io/raft/etcd-raft-client-interaction/'><span>Raft 笔记</span></a></p><p>&nbsp;</p></div>
+</body>
+</html>
