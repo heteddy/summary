@@ -1,1 +1,0 @@
-![](.images/EQ0HBFdmfTdUj.png)

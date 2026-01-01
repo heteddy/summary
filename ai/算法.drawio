@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3" pages="4">
   <diagram id="BWP5algJzuk_uriflOLb" name="transformer">
-    <mxGraphModel dx="3935" dy="3407" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="4331" dy="3330" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -191,7 +191,7 @@
           <mxGeometry x="-384" y="895" width="20" height="85" as="geometry" />
         </mxCell>
         <mxCell id="Yvl_u48jdwtjXfyFhl5y-200" value="h 次&lt;div&gt;h=8&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="-370" y="920" width="60" height="30" as="geometry" />
+          <mxGeometry x="-370" y="920" width="110" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Yvl_u48jdwtjXfyFhl5y-202" value="&lt;span style=&quot;caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0); font-family: monospace; font-size: 14px; font-style: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: auto; text-align: left; text-indent: 0px; text-transform: none; white-space: nowrap; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(248, 248, 248); text-decoration: none; display: inline !important; float: none;&quot;&gt;[L, d_model]&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0); font-family: monospace; font-size: 14px; font-style: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: auto; text-align: left; text-indent: 0px; text-transform: none; white-space: nowrap; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(248, 248, 248); text-decoration: none; display: inline !important; float: none;&quot;&gt;L token 长度&lt;/span&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-770" y="1014" width="130" height="40" as="geometry" />
@@ -667,7 +667,7 @@
     </mxGraphModel>
   </diagram>
   <diagram name="gpt" id="ySjCSLjJKap64BonE_rv">
-    <mxGraphModel dx="2726" dy="1956" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="4984" dy="2955" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1881,7 +1881,7 @@
           <mxGeometry x="4020" y="3800" width="270" height="50" as="geometry" />
         </mxCell>
         <mxCell id="OjI_0L5_JND0J9m_5wrc-196" value="&lt;div class=&quot;md-code-block-banner-wrap&quot; style=&quot;z-index: 6; position: sticky; top: 0px; font-family: quote-cjk-patch, Inter, system-ui, -apple-system, &amp;quot;system-ui&amp;quot;, &amp;quot;Segoe UI&amp;quot;, Roboto, Oxygen, Ubuntu, Cantarell, &amp;quot;Open Sans&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, sans-serif; font-size: 16px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: normal; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial;&quot;&gt;&lt;div class=&quot;md-code-block-banner md-code-block-banner-lite&quot; style=&quot;background-image: none; background-position: 0% 0%; background-size: auto; background-repeat: repeat; background-attachment: scroll; background-origin: padding-box; background-clip: border-box; padding: 0px; font-size: 12.573px; line-height: 12.573px; justify-content: space-between; display: flex; border-top-left-radius: 12px; border-top-right-radius: 12px;&quot;&gt;&lt;div class=&quot;_121d384&quot; style=&quot;justify-content: space-between; align-items: center; width: 740px; padding: 6px; display: flex;&quot;&gt;&lt;div class=&quot;d2a24f03&quot; style=&quot;flex-shrink: 0;&quot;&gt;&lt;span class=&quot;d813de27&quot; style=&quot;font-family: Menlo, Monaco, Consolas, &amp;quot;Cascadia Mono&amp;quot;, &amp;quot;Ubuntu Mono&amp;quot;, &amp;quot;DejaVu Sans Mono&amp;quot;, &amp;quot;Liberation Mono&amp;quot;, &amp;quot;JetBrains Mono&amp;quot;, &amp;quot;Fira Code&amp;quot;, Cousine, &amp;quot;Roboto Mono&amp;quot;, &amp;quot;Courier New&amp;quot;, Courier, sans-serif, system-ui; margin-left: 8px; font-size: 12px; line-height: 18px;&quot;&gt;text 因果+掩码&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre style=&quot;font: 400 13px / 22px Menlo, Monaco, Consolas, &amp;quot;Cascadia Mono&amp;quot;, &amp;quot;Ubuntu Mono&amp;quot;, &amp;quot;DejaVu Sans Mono&amp;quot;, &amp;quot;Liberation Mono&amp;quot;, &amp;quot;JetBrains Mono&amp;quot;, &amp;quot;Fira Code&amp;quot;, Cousine, &amp;quot;Roboto Mono&amp;quot;, &amp;quot;Courier New&amp;quot;, Courier, sans-serif, system-ui; overflow: auto; white-space: pre-wrap; word-break: break-all; padding: 16px; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; margin: 0px !important;&quot;&gt;序列位置:   1    2    3    4&lt;br&gt;        1 [1,  -∞,  -∞,  -∞]&lt;br&gt;        2 [1,   1,  -∞,  -∞] &lt;br&gt;        3 [1,   1,   1,  -∞]&lt;br&gt;        4 [1,   1,   1,   1]&lt;br&gt;        &lt;br&gt;说明: 1表示允许关注，-∞表示掩码(禁止关注)&lt;br&gt;每个位置只能关注自身及之前的位置&lt;/pre&gt;" style="text;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=default;strokeColor=#666666;labelBackgroundColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1020" y="1160" width="320" height="260" as="geometry" />
+          <mxGeometry x="1020" y="1160" width="410" height="250" as="geometry" />
         </mxCell>
         <mxCell id="OjI_0L5_JND0J9m_5wrc-197" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="5XKhNyWqluOw8G5o39U4-200" target="OjI_0L5_JND0J9m_5wrc-196" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -3070,6 +3070,12 @@
             <mxPoint x="1027.41" y="3762.71" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="iKoMEbE9W1n_qSmlGuXE-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;策略&lt;/h1&gt;&lt;p&gt;top_k: 前K个&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;top_p&lt;/span&gt;：概率和满足top_p&lt;/p&gt;&lt;p&gt;temprature:&amp;nbsp; softmax计算时指数增加分母&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="3920" y="3570" width="430" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="iKoMEbE9W1n_qSmlGuXE-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;任务&lt;/h1&gt;&lt;div&gt;分类&lt;/div&gt;&lt;div&gt;蕴含&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="3917" y="4000" width="180" height="120" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
@@ -3091,7 +3097,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="dzC6g2NEselMosrDgQrO" name="知识图谱">
-    <mxGraphModel dx="2100" dy="2104" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2920" dy="2161" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
