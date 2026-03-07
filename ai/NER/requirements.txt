@@ -1,0 +1,16 @@
+# MacBERT + 指针网络 NER 依赖包
+
+# PyTorch
+torch>=1.8.0
+
+# Transformers
+transformers>=4.0.0
+
+# 数据处理
+numpy>=1.19.0
+
+# 进度条
+tqdm>=4.50.0
+
+# 可选：GPU 加速
+# torch>=1.8.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
