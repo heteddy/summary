@@ -754,8 +754,231 @@ class MacBERTForQueryRewrite(nn.Module):
         return predicted_ids, confidence
 
 
+class MacBERTForSpanDetection(nn.Module):
+    """
+    Span 级别改写 - Span 检测模型
+    
+    用于识别查询中需要改写的文本片段（两阶段方法的第一阶段）
+    """
+    
+    def __init__(self, model_name="hfl/chinese-macbert-base"):
+        """
+        初始化 Span 检测模型
+        
+        Args:
+            model_name: MacBERT 模型名称或路径
+        """
+        super(MacBERTForSpanDetection, self).__init__()
+        self.bert = BertModel.from_pretrained(model_name)
+        self.config = self.bert.config
+        
+        # BIO 标注：O, B-SPAN, I-SPAN (3 类)
+        self.num_labels = 3
+        self.classifier = nn.Linear(self.config.hidden_size, self.num_labels)
+        
+        logger.info(f"加载 MacBERT Span 检测模型：{model_name}")
+        logger.info(f"标签数量：{self.num_labels}")
+    
+    def forward(self, input_ids, attention_mask=None, bio_labels=None):
+        """
+        前向传播
+        
+        Args:
+            input_ids: 输入 token IDs [batch_size, seq_len]
+            attention_mask: 注意力掩码 [batch_size, seq_len]
+            bio_labels: BIO 标签 [batch_size, seq_len]
+            
+        Returns:
+            loss: 如果提供了 labels，返回损失
+            logits: 预测分数 [batch_size, seq_len, num_labels]
+        """
+        # BERT 编码
+        outputs = self.bert(
+            input_ids=input_ids,
+            attention_mask=attention_mask
+        )
+        
+        sequence_output = outputs.last_hidden_state
+        
+        # 预测每个位置的 BIO 标签
+        logits = self.classifier(sequence_output)
+        
+        loss = None
+        if bio_labels is not None:
+            # 计算交叉熵损失，忽略 label=-100 的位置
+            loss_fct = nn.CrossEntropyLoss(ignore_index=-100)
+            
+            # reshape 用于计算 loss
+            batch_size, seq_len, num_labels = logits.shape
+            logits_flat = logits.view(-1, num_labels)
+            labels_flat = bio_labels.view(-1)
+            
+            loss = loss_fct(logits_flat, labels_flat)
+        
+        return loss, logits
+    
+    def detect_spans(self, input_ids, attention_mask=None):
+        """
+        检测需要改写的 spans
+        
+        Args:
+            input_ids: 输入 token IDs
+            attention_mask: 注意力掩码
+            
+        Returns:
+            spans: 检测到的 spans 列表 [(start, end), ...]
+            confidence: 置信度
+        """
+        self.eval()
+        with torch.no_grad():
+            _, logits = self.forward(input_ids, attention_mask)
+            
+            # 获取预测的 BIO 标签
+            probs = torch.softmax(logits, dim=-1)
+            confidence, predictions = torch.max(probs, dim=-1)
+            
+            # 解析 BIO 序列为 spans
+            predictions = predictions[0].cpu().numpy()
+            confidence = confidence[0].cpu().numpy()
+            
+            spans = []
+            current_span = None
+            
+            for i, pred in enumerate(predictions):
+                if pred == 1:  # B-SPAN
+                    if current_span:
+                        spans.append(current_span)
+                    current_span = {'start': i, 'end': i + 1}
+                elif pred == 2:  # I-SPAN
+                    if current_span:
+                        current_span['end'] = i + 1
+                else:  # O
+                    if current_span:
+                        spans.append(current_span)
+                        current_span = None
+            
+            # 处理最后一个 span
+            if current_span:
+                spans.append(current_span)
+            
+            avg_confidence = confidence.mean()
+            
+            return spans, avg_confidence
+
+
+class MacBERTForSpanRewrite(nn.Module):
+    """
+    Span 级别改写 - Span 改写模型
+    
+    对检测到的 span 进行改写（两阶段方法的第二阶段）
+    使用 Encoder-Decoder 架构
+    """
+    
+    def __init__(self, encoder_name="hfl/chinese-macbert-base", 
+                 decoder_name="gpt2"):
+        """
+        初始化 Span 改写模型
+        
+        Args:
+            encoder_name: 编码器模型名称
+            decoder_name: 解码器模型名称
+        """
+        super(MacBERTForSpanRewrite, self).__init__()
+        
+        from transformers import EncoderDecoderModel, GPT2Tokenizer
+        
+        # 创建 Encoder-Decoder 模型
+        self.model = EncoderDecoderModel.from_encoder_decoder_pretrained(
+            encoder_name,
+            decoder_name
+        )
+        
+        self.encoder_tokenizer = BertTokenizer.from_pretrained(encoder_name)
+        self.decoder_tokenizer = GPT2Tokenizer.from_pretrained(decoder_name)
+        
+        # 设置 pad token
+        if self.decoder_tokenizer.pad_token is None:
+            self.decoder_tokenizer.pad_token = self.decoder_tokenizer.eos_token
+        
+        self.model.config.decoder_start_token_id = self.decoder_tokenizer.bos_token_id
+        self.model.config.eos_token_id = self.decoder_tokenizer.eos_token_id
+        self.model.config.pad_token_id = self.decoder_tokenizer.pad_token_id
+        
+        logger.info(f"加载 Span 改写模型：Encoder={encoder_name}, Decoder={decoder_name}")
+    
+    def forward(self, input_ids, attention_mask=None, decoder_input_ids=None, 
+                decoder_labels=None):
+        """
+        前向传播
+        
+        Args:
+            input_ids: 编码器输入 [batch_size, seq_len]
+            attention_mask: 注意力掩码
+            decoder_input_ids: 解码器输入
+            decoder_labels: 解码器标签
+            
+        Returns:
+            loss: 如果提供了 labels，返回损失
+            logits: 解码器输出
+        """
+        outputs = self.model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            decoder_input_ids=decoder_input_ids,
+            labels=decoder_labels
+        )
+        
+        return outputs.loss, outputs.logits
+    
+    def rewrite_span(self, span_text, context_before="", context_after="", 
+                     max_length=50):
+        """
+        改写单个 span
+        
+        Args:
+            span_text: 需要改写的 span 文本
+            context_before: 上文
+            context_after: 下文
+            max_length: 最大生成长度
+            
+        Returns:
+            rewritten_text: 改写后的文本
+        """
+        self.eval()
+        
+        # 构建输入：上下文 + span
+        input_text = f"{context_before} [SPAN] {span_text} [SPAN_END] {context_after}"
+        
+        # 分词
+        inputs = self.encoder_tokenizer(
+            input_text,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=max_length
+        )
+        
+        # 生成
+        with torch.no_grad():
+            outputs = self.model.generate(
+                inputs["input_ids"],
+                attention_mask=inputs.get("attention_mask"),
+                max_length=max_length,
+                num_beams=4,
+                early_stopping=True
+            )
+        
+        # 解码
+        rewritten_text = self.decoder_tokenizer.decode(
+            outputs[0],
+            skip_special_tokens=True
+        )
+        
+        return rewritten_text
+
+
 class Trainer:
-    """训练器"""
+    """训练器 - 增强版（支持 Span 级别）"""
     
     def __init__(self, model, train_dataset, val_dataset, args):
         """
@@ -771,6 +994,7 @@ class Trainer:
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
         self.args = args
+        self.strategy = getattr(train_dataset, 'strategy', 'standard')
         
         # 设备配置
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -808,9 +1032,54 @@ class Trainer:
         # 最佳模型保存路径
         self.best_model_path = args.output_dir
         os.makedirs(self.best_model_path, exist_ok=True)
+        
+        logger.info(f"训练策略：{self.strategy}")
+    
+    def train_epoch_span_level(self, epoch):
+        """训练一个 epoch（Span 级别专用）"""
+        self.model.train()
+        total_loss = 0
+        num_batches = 0
+        
+        progress_bar = tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.args.epochs}")
+        
+        for batch in progress_bar:
+            # 准备数据（Span 级别格式）
+            input_ids = batch["input_ids"].to(self.device)
+            attention_mask = batch["attention_mask"].to(self.device)
+            bio_labels = batch["bio_labels"].to(self.device)
+            
+            # 前向传播（Span 检测）
+            self.optimizer.zero_grad()
+            loss, _ = self.model(input_ids, attention_mask, bio_labels)
+            
+            # 反向传播
+            loss.backward()
+            
+            # 梯度裁剪
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
+            
+            # 更新参数
+            self.optimizer.step()
+            self.scheduler.step()
+            
+            # 记录损失
+            total_loss += loss.item()
+            num_batches += 1
+            
+            # 更新进度条
+            progress_bar.set_postfix({"loss": loss.item()})
+        
+        avg_loss = total_loss / max(num_batches, 1)
+        return avg_loss
     
     def train_epoch(self, epoch):
         """训练一个 epoch"""
+        # 如果是 Span 级别，使用专门的训练方法
+        if self.strategy == "span_level":
+            return self.train_epoch_span_level(epoch)
+        
+        # 否则使用标准训练方法
         self.model.train()
         total_loss = 0
         num_batches = 0
@@ -821,11 +1090,19 @@ class Trainer:
             # 准备数据
             input_ids = batch["input_ids"].to(self.device)
             attention_mask = batch["attention_mask"].to(self.device)
-            labels = batch["labels"].to(self.device)
+            labels = batch.get("labels")
+            
+            if labels is not None:
+                labels = labels.to(self.device)
             
             # 前向传播
             self.optimizer.zero_grad()
-            loss, _ = self.model(input_ids, attention_mask, labels)
+            
+            # 根据模型类型调用不同的 forward
+            if isinstance(self.model, MacBERTForSpanDetection):
+                loss, _ = self.model(input_ids, attention_mask, bio_labels=labels)
+            else:
+                loss, _ = self.model(input_ids, attention_mask, labels)
             
             # 反向传播
             loss.backward()
@@ -847,8 +1124,8 @@ class Trainer:
         avg_loss = total_loss / num_batches
         return avg_loss
     
-    def evaluate(self, epoch):
-        """评估模型"""
+    def evaluate_span_level(self, epoch):
+        """评估模型（Span 级别专用）"""
         self.model.eval()
         total_loss = 0
         num_batches = 0
@@ -857,9 +1134,38 @@ class Trainer:
             for batch in tqdm(self.val_loader, desc=f"Validation {epoch+1}"):
                 input_ids = batch["input_ids"].to(self.device)
                 attention_mask = batch["attention_mask"].to(self.device)
-                labels = batch["labels"].to(self.device)
+                bio_labels = batch["bio_labels"].to(self.device)
                 
-                loss, _ = self.model(input_ids, attention_mask, labels)
+                loss, _ = self.model(input_ids, attention_mask, bio_labels)
+                total_loss += loss.item()
+                num_batches += 1
+        
+        avg_loss = total_loss / max(num_batches, 1)
+        return avg_loss
+    
+    def evaluate(self, epoch):
+        """评估模型"""
+        if self.strategy == "span_level":
+            return self.evaluate_span_level(epoch)
+        
+        self.model.eval()
+        total_loss = 0
+        num_batches = 0
+        
+        with torch.no_grad():
+            for batch in tqdm(self.val_loader, desc=f"Validation {epoch+1}"):
+                input_ids = batch["input_ids"].to(self.device)
+                attention_mask = batch["attention_mask"].to(self.device)
+                labels = batch.get("labels")
+                
+                if labels is not None:
+                    labels = labels.to(self.device)
+                
+                if isinstance(self.model, MacBERTForSpanDetection):
+                    loss, _ = self.model(input_ids, attention_mask, bio_labels=labels)
+                else:
+                    loss, _ = self.model(input_ids, attention_mask, labels)
+                
                 total_loss += loss.item()
                 num_batches += 1
         
@@ -897,8 +1203,14 @@ class Trainer:
         torch.save(model_to_save.state_dict(), os.path.join(output_dir, "pytorch_model.bin"))
         
         # 保存配置文件
-        model_to_save.bert.config.to_json_file(os.path.join(output_dir, "config.json"))
-        self.train_dataset.builder.tokenizer.save_pretrained(output_dir)
+        if hasattr(model_to_save, 'bert'):
+            model_to_save.bert.config.to_json_file(os.path.join(output_dir, "config.json"))
+        elif hasattr(model_to_save, 'model'):
+            model_to_save.model.config.to_json_file(os.path.join(output_dir, "config.json"))
+        
+        # 保存 tokenizer
+        if hasattr(self.train_dataset.builder, 'tokenizer'):
+            self.train_dataset.builder.tokenizer.save_pretrained(output_dir)
         
         logger.info(f"模型已保存到 {output_dir}")
 
