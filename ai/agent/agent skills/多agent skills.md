@@ -337,7 +337,11 @@ Agent 执行 read_file（可能通过 MCP Server 访问文件系统），并将�
 
 此时模型结合了 Skill 规范（必须导入 os，必须创建模板文件）和 真实代码，做出最终决策。
 
-4.1  agent ->llm
+4.1  agent ->llm  
+
+todo
+
+<span style="color:rgba(244,63,94,1)"> <font color="red">上下文错误</font></span>
 
 ```json
 {
