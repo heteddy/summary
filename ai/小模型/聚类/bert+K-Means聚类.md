@@ -6,8 +6,6 @@ Faiss 的 `Kmeans` 类可以直接在 CPU 或 GPU 上运行，适合大规模向
 
 ## 示例代码（Python）
 
-
-
 ```python
 import numpy as np
 import faiss  # pip install faiss-cpu 或 faiss-gpu
@@ -65,7 +63,6 @@ if __name__ == "__main__":
 
     print("\n聚类中心形状:", centroids.shape)
     print("前 10 个样本的聚类标签:", labels[:10])
-
 ```
 
 ***
@@ -73,32 +70,30 @@ if __name__ == "__main__":
 ## 运行说明
 
 1. **安装 Faiss**
-
+   
    - CPU 版本：
 
 ##### Bash
 
      `pip install faiss-cpu`
 
-   - GPU 版本（需 CUDA）：
+- GPU 版本（需 CUDA）：
 
 ##### Bash
 
      `pip install faiss-gpu`
 
-
 2. **关键参数**
-
+   
    - `d`：向量维度（自动从数据推断）
    - `k`：聚类中心数
    - `niter`：迭代次数（一般 20~50 即可）
    - `gpu`：是否使用 GPU 加速
 
 3. **输出**
-
+   
    - `centroids`：形状为 `(k, dim)` 的聚类中心
    - `assignments`：每个样本对应的聚类标签
-
 
 ***
 

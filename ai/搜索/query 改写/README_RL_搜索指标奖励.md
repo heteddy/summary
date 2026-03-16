@@ -5,24 +5,29 @@
 ### ✅ 已完成的修改
 
 #### 1. **新增 SearchMetricReward 类**
+
 实现了基于搜索评估指标的奖励计算器，包括：
 
 - **NDCG 计算**（三种模式）
+  
   - 标准 NDCG（需要理想排序）
   - 基于用户反馈的 NDCG（从点击行为推断相关性）
   - 启发式 NDCG（基于结果质量估计）
 
 - **MRR 计算**
+  
   - 基于用户点击确定第一个相关文档
   - 启发式方法（基于内容完整性）
 
 - **用户反馈奖励**
+  
   - 点击数量和比例
   - 满意点击
   - 停留时间分析
   - 查询重构惩罚
 
 #### 2. **更新 RewardFunction 类**
+
 ```python
 class RewardFunction:
     def calculate_reward(self, original_query, rewritten_query, 
@@ -31,7 +36,7 @@ class RewardFunction:
                         ideal_ranking=None):  # 新增
         """
         计算综合奖励
-        
+
         新参数:
             search_results: 搜索结果列表 [{doc_id, title, content, ...}]
             user_feedback: 用户反馈 {
@@ -45,12 +50,13 @@ class RewardFunction:
 ```
 
 #### 3. **更新 PPOTrainer.train_epoch() 方法**
+
 ```python
 def train_epoch(self, data_loader, epoch, search_engine_fn=None):
     """
     新增参数:
         search_engine_fn: 搜索引擎函数 (query) -> [search_results]
-    
+
     主要变化:
     1. 调用搜索引擎获取改写 query 的搜索结果
     2. 获取或模拟用户反馈
@@ -60,11 +66,12 @@ def train_epoch(self, data_loader, epoch, search_engine_fn=None):
 ```
 
 #### 4. **新增 _get_user_feedback() 方法**
+
 ```python
 def _get_user_feedback(self, original_query, rewritten_query, search_results):
     """
     获取或模拟用户反馈
-    
+
     模拟规则:
     - 排名越靠前，点击概率越高
     - 高质量文档更可能获得长停留和满意点击
@@ -73,13 +80,14 @@ def _get_user_feedback(self, original_query, rewritten_query, search_results):
 ```
 
 #### 5. **更新 TwoStageTrainer.stage2_reinforcement_learning()**
+
 ```python
 def stage2_reinforcement_learning(self, pretrained_model_path, train_data, 
                                  val_data, search_engine_fn=None):
     """
     新增参数:
         search_engine_fn: 搜索引擎函数
-    
+
     主要变化:
     1. 初始化 SearchMetricReward
     2. 使用新的 RewardFunction
@@ -90,11 +98,13 @@ def stage2_reinforcement_learning(self, pretrained_model_path, train_data,
 ### 📊 奖励计算公式
 
 **综合奖励**:
+
 ```python
 reward = 0.4 * NDCG@10 + 0.3 * MRR + 0.3 * Feedback
 ```
 
 **NDCG 计算**:
+
 ```python
 if ideal_ranking exists:
     ndcg = standard_ndcg(search_results, ideal_ranking)
@@ -105,6 +115,7 @@ else:
 ```
 
 **用户反馈奖励**:
+
 ```python
 feedback = (
     0.3 * click_reward +       # min(1.0, num_clicks/3)
@@ -117,6 +128,7 @@ feedback = (
 ### 🔧 使用方法
 
 #### 基础训练
+
 ```python
 from macbert_rl_query_rewrite_train import TwoStageTrainer
 
@@ -139,6 +151,7 @@ rl_model = trainer.stage2_reinforcement_learning(
 ```
 
 #### 自定义权重
+
 ```python
 class CustomReward(RewardFunction):
     def calculate_reward(self, original, rewritten, search_results, 
@@ -147,7 +160,7 @@ class CustomReward(RewardFunction):
             original, rewritten, search_results, 
             user_feedback, ideal_ranking
         )
-        
+
         # 自定义权重
         return (
             0.5 * rewards['ndcg'] +      # 更重视 NDCG
@@ -169,6 +182,7 @@ RL Epoch 1/5 - Loss: 0.1234, Reward: 0.6612
 ### 🎯 实际应用场景
 
 #### 场景 1: 有标注数据
+
 ```python
 ideal_ranking = ["doc1", "doc2", "doc3"]  # 专家标注
 reward = reward_fn.calculate_reward(
@@ -179,6 +193,7 @@ reward = reward_fn.calculate_reward(
 ```
 
 #### 场景 2: 在线学习
+
 ```python
 # 从日志数据库获取真实用户反馈
 user_feedback = db.get_feedback(session_id, query)
@@ -190,6 +205,7 @@ reward = reward_fn.calculate_reward(
 ```
 
 #### 场景 3: 离线评估
+
 ```python
 # 没有用户反馈，使用启发式估计
 reward = reward_fn.calculate_reward(
@@ -202,6 +218,7 @@ reward = reward_fn.calculate_reward(
 ### 📁 文件清单
 
 1. **macbert_rl_query_rewrite_train.py** - 主训练代码（已更新）
+   
    - `SearchMetricReward` - 新增类
    - `RewardFunction` - 更新
    - `PPOTrainer.train_epoch()` - 更新
@@ -230,6 +247,7 @@ reward = reward_fn.calculate_reward(
 4. **持续优化** - 根据实际效果调整奖励权重
 
 开始训练：
+
 ```bash
 python macbert_rl_query_rewrite_train.py
 ```
