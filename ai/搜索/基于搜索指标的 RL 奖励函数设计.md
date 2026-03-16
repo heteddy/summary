@@ -23,6 +23,7 @@ NDCG 衡量搜索结果的排序质量，考虑了相关性的分级和位置折
 #### 三种计算模式：
 
 **模式 1: 标准 NDCG（需要理想排序）**
+
 ```python
 # 如果有标注的理想排序
 ideal_ranking = ["doc1", "doc2", "doc3", ...]  # 按相关性排序
@@ -30,6 +31,7 @@ ndcg = calculate_ndcg(search_results, ideal_ranking)
 ```
 
 **模式 2: 基于用户反馈的 NDCG**
+
 ```python
 # 从用户行为推断相关性
 relevance_inference_rules:
@@ -46,6 +48,7 @@ ndcg = dcg / idcg
 ```
 
 **模式 3: 启发式 NDCG**
+
 ```python
 # 基于结果质量估计
 scoring_factors:
@@ -67,6 +70,7 @@ for i, result in enumerate(search_results):
 ```
 
 **相关性判断：**
+
 - 有用户点击 → 相关
 - 有满意点击 → 更相关
 - 内容完整（标题 + 摘要）→ 可能相关
@@ -86,12 +90,12 @@ feedback_reward = (
 
 **详细规则：**
 
-| 指标 | 计算方法 | 权重 |
-|------|---------|------|
-| **点击奖励** | min(1.0, num_clicks/3) | 0.3 |
-| **满意奖励** | min(1.0, num_satisfied/2) | 0.4 |
+| 指标       | 计算方法                                                                                 | 权重  |
+| -------- | ------------------------------------------------------------------------------------ | --- |
+| **点击奖励** | min(1.0, num_clicks/3)                                                               | 0.3 |
+| **满意奖励** | min(1.0, num_satisfied/2)                                                            | 0.4 |
 | **停留时间** | avg_dwell > 60s → 1.0<br>avg_dwell > 30s → 0.5<br>avg_dwell > 10s → 0.0<br>否则 → -0.5 | 0.2 |
-| **查询重构** | reformulated=True → -0.5 | 0.1 |
+| **查询重构** | reformulated=True → -0.5                                                             | 0.1 |
 
 ## 代码实现
 
@@ -104,7 +108,7 @@ class SearchMetricReward:
                         ideal_ranking=None):
         """
         计算综合奖励
-        
+
         Args:
             original_query: 原始查询
             rewritten_query: 改写后的查询
@@ -116,7 +120,7 @@ class SearchMetricReward:
                 reformulated: bool
             }
             ideal_ranking: 理想排序 [doc_ids]
-            
+
         Returns:
             {
                 'ndcg': float,
@@ -135,13 +139,13 @@ def train_epoch(self, data_loader, epoch, search_engine_fn):
         # 1. 采样动作（生成改写 query）
         actions, _, _ = model.sample_actions(input_ids)
         rewritten_queries = decode(actions)
-        
+
         # 2. 执行搜索，获取结果
         search_results = search_engine_fn(rewritten_queries)
-        
+
         # 3. 获取用户反馈（真实或模拟）
         user_feedback = get_user_feedback(original, rewritten, search_results)
-        
+
         # 4. 计算奖励
         rewards = reward_fn.calculate_reward(
             original_query=original,
@@ -149,7 +153,7 @@ def train_epoch(self, data_loader, epoch, search_engine_fn):
             search_results=search_results,
             user_feedback=user_feedback
         )
-        
+
         # 5. PPO 更新
         loss = policy_loss + value_loss - entropy_loss
         loss.backward()
@@ -187,7 +191,7 @@ reward = reward_fn.calculate_reward(
 def online_reward_calculation(query, rewritten):
     # 1. 使用改写的 query 搜索
     results = search_engine.search(rewritten)
-    
+
     # 2. 收集用户行为日志
     user_feedback = {
         'clicked_docs': get_clicked_docs(session_id),
@@ -195,7 +199,7 @@ def online_reward_calculation(query, rewritten):
         'dwell_time': get_dwell_times(session_id),
         'reformulated': did_reformulate(session_id)
     }
-    
+
     # 3. 计算奖励
     reward = reward_fn.calculate_reward(
         original_query=query,
@@ -203,7 +207,7 @@ def online_reward_calculation(query, rewritten):
         search_results=results,
         user_feedback=user_feedback
     )
-    
+
     return reward
 ```
 
@@ -228,14 +232,14 @@ class RLArgs:
     ndcg_weight = 0.4          # NDCG 权重
     mrr_weight = 0.3           # MRR 权重
     feedback_weight = 0.3      # 用户反馈权重
-    
+
     # NDCG 参数
     ndcg_k = 10                # NDCG@K
-    
+
     # 用户反馈参数
     long_dwell_threshold = 60  # 长停留时间阈值（秒）
     medium_dwell_threshold = 20  # 中等停留时间阈值
-    
+
     # PPO 参数
     clip_epsilon = 0.2
     gamma = 0.99
@@ -276,30 +280,31 @@ rl_search_metric.evaluate()
 
 ### 相比简单奖励函数的优势
 
-| 特性 | 简单奖励 | 搜索指标奖励 |
-|------|---------|-------------|
-| **优化目标** | 文本相似度 | 搜索效果指标 |
-| **与业务对齐** | 弱 | 强（直接优化 NDCG/MRR） |
-| **用户导向** | 否 | 是（考虑用户反馈） |
-| **可解释性** | 低 | 高（标准 IR 指标） |
-| **泛化能力** | 有限 | 更好（学到搜索优化策略） |
+| 特性        | 简单奖励  | 搜索指标奖励           |
+| --------- | ----- | ---------------- |
+| **优化目标**  | 文本相似度 | 搜索效果指标           |
+| **与业务对齐** | 弱     | 强（直接优化 NDCG/MRR） |
+| **用户导向**  | 否     | 是（考虑用户反馈）        |
+| **可解释性**  | 低     | 高（标准 IR 指标）      |
+| **泛化能力**  | 有限    | 更好（学到搜索优化策略）     |
 
 ### 数学形式化
 
 **目标函数**：
-$$\max_\theta \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \gamma^t \cdot R(s_t, a_t) \right]$$
+
+$$\max_\theta \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \gamma^t \cdot R(s_t, a_t) \right]$
 
 其中奖励函数：
-$$R = 0.4 \cdot \text{NDCG}_K + 0.3 \cdot \text{MRR} + 0.3 \cdot \text{Feedback}$$
+$$R = 0.4 \cdot \text{NDCG}_K + 0.3 \cdot \text{MRR} + 0.3 \cdot \text{Feedback}$
 
 **NDCG 计算**：
-$$\text{NDCG}_K = \frac{\text{DCG}_K}{\text{IDCG}_K} = \frac{\sum_{i=1}^{K} \frac{2^{rel_i} - 1}{\log_2(i+1)}}{\sum_{i=1}^{K} \frac{2^{rel^*_i} - 1}{\log_2(i+1)}}$$
+$\text{NDCG}_K = \frac{\text{DCG}_K}{\text{IDCG}_K} = \frac{\sum_{i=1}^{K} \frac{2^{rel_i} - 1}{\log_2(i+1)}}{\sum_{i=1}^{K} \frac{2^{rel^*_i} - 1}{\log_2(i+1)}}$
 
 **MRR 计算**：
-$$\text{MRR} = \frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} \frac{1}{\text{rank}_q}$$
+$\text{MRR} = \frac{1}{|\mathcal{Q}|} \sum_{q \in \mathcal{Q}} \frac{1}{\text{rank}_q}$
 
 **用户反馈**：
-$$\text{Feedback} = \sum_{i} w_i \cdot f_i(\text{clicks}, \text{dwell}, \text{satisfaction})$$
+$\text{Feedback} = \sum_{i} w_i \cdot f_i(\text{clicks}, \text{dwell}, \text{satisfaction})$
 
 ## 总结
 

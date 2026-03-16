@@ -20,15 +20,15 @@
   "original_query": "电脑登录不了",
   "target_query": "电脑无法登录",
   "method": "align_with_insert",
-  
+
   // 分词结果
   "orig_tokens": ["电", "脑", "登", "录", "不", "了"],
   "tgt_tokens": ["电", "脑", "无", "法", "登", "录"],
-  
+
   // 对齐结果
   "aligned_source": ["电", "脑", "登", "录", "不", "了"],
   "aligned_target": ["电", "脑", "无", "法", "登", "录"],
-  
+
   // 操作类型
   "operations": [
     ("KEEP", 0, 0),
@@ -38,7 +38,7 @@
     ("DELETE", 4, -1),
     ("DELETE", 5, -1)
   ],
-  
+
   // 模型输入
   "input_ids": [101, 2345, 6789, 1234, 5678, 9012, 3456, 102],
   "labels": [-100, 2345, 6789, 4567, 8901, 1234, 5678, -100],
@@ -47,6 +47,7 @@
 ```
 
 **说明**:
+
 - `input_ids`: [CLS] + 原始 tokens + [SEP]
 - `labels`: 
   - CLS 和 SEP 位置为 -100（不参与 loss）
@@ -65,15 +66,15 @@
   "original_query": "vpn 到期",
   "target_query": "vpn 续费申请",
   "method": "align_with_insert",
-  
+
   // 分词结果
   "orig_tokens": ["vpn", "到", "期"],
   "tgt_tokens": ["vpn", "续", "费", "申", "请"],
-  
+
   // 对齐结果（关键：添加了<INS>标记）
   "aligned_source": ["vpn", "<INS>", "<INS>", "到", "期"],
   "aligned_target": ["vpn", "续", "费", "申", "请"],
-  
+
   // 操作类型
   "operations": [
     ("KEEP", 0, 0),
@@ -82,7 +83,7 @@
     ("REPLACE", 1, 3),
     ("REPLACE", 2, 4)
   ],
-  
+
   // 模型输入
   "input_ids": [
     101,     // [CLS]
@@ -107,6 +108,7 @@
 ```
 
 **关键点**:
+
 1. 源序列中添加了 2 个 `<INS>` 标记
 2. `<INS>` 位置的 label 是要插入的词（"续", "费"）
 3. 现在输入和输出长度一致（都是 7 个 token）
@@ -123,15 +125,15 @@
   "original_query": "寿改怎么办",
   "target_query": "寿险改革",
   "method": "align_with_insert",
-  
+
   // 分词结果
   "orig_tokens": ["寿", "改", "怎", "么", "办"],
   "tgt_tokens": ["寿", "险", "改", "革"],
-  
+
   // 对齐结果
   "aligned_source": ["寿", "改", "怎", "么", "办"],
   "aligned_target": ["寿", "险", "改", "革", "<DEL>"],
-  
+
   // 操作类型
   "operations": [
     ("KEEP", 0, 0),
@@ -140,7 +142,7 @@
     ("REPLACE", 3, 3),
     ("DELETE", 4, -1)
   ],
-  
+
   // 模型输入
   "input_ids": [101, 8901, 2345, 3456, 7890, 1234, 102],
   "labels": [
@@ -168,11 +170,11 @@
   "original_query": "拧毛巾怎么清洗",
   "target_query": "清洗毛巾的方法",
   "method": "align_with_insert",
-  
+
   // 分词结果
   "orig_tokens": ["拧", "毛", "巾", "怎", "么", "清", "洗"],
   "tgt_tokens": ["清", "洗", "毛", "巾", "的", "方", "法"],
-  
+
   // 对齐结果
   "aligned_source": [
     "拧", "<INS>", "<INS>", "毛", "巾", 
@@ -182,7 +184,7 @@
     "清", "洗", "毛", "巾", "的", 
     "方", "法", "<DEL>", "<DEL>", "<DEL>"
   ],
-  
+
   // 操作类型
   "operations": [
     ("REPLACE", 0, 0),      // 拧 -> 清
@@ -195,7 +197,7 @@
     ("DELETE", 5, -1),      // 清 -> 删除
     ("DELETE", 6, -1)       // 洗 -> 删除
   ],
-  
+
   // 模型输入（简化表示）
   "input_ids": [
     [CLS], "拧", "<INS>", "<INS>", "毛", "巾", 
@@ -312,6 +314,7 @@ rewritten = "vpn 续费申请"
 ```
 
 **输出**:
+
 ```json
 {
   "original_query": "vpn 到期",
@@ -333,6 +336,7 @@ rewritten = "vpn 续费申请"
 **输入**: "电脑登录不了"
 
 **输出**:
+
 ```json
 {
   "original_query": "电脑登录不了",
@@ -404,21 +408,21 @@ rewritten = "vpn 续费申请"
 ```python
 def visualize_alignment(original, target, aligned_source, aligned_target):
     """可视化对齐结果"""
-    
+
     print("=" * 60)
     print(f"原始查询：{original}")
     print(f"目标查询：{target}")
     print("=" * 60)
-    
+
     # 并排显示对齐
     print("\n对齐结果:")
     print(f"{'源序列':<20} | {'目标序列':<20}")
     print("-" * 45)
-    
+
     for src, tgt in zip(aligned_source, aligned_target):
         op = "→" if src != tgt else "="
         print(f"{src:<10} {op:>2} {tgt:<10}")
-    
+
     print("=" * 60)
 
 # 使用示例
@@ -431,6 +435,7 @@ visualize_alignment(
 ```
 
 **输出**:
+
 ```
 ============================================================
 原始查询：vpn 到期
@@ -481,6 +486,7 @@ print("Labels length:", len(sample['labels']))
 **问题**: 当需要连续插入多个词时（如插入"续费申请"4 个字），模型可能难以学习。
 
 **解决方案**:
+
 1. 在训练数据中增加类似模式的样本
 2. 使用更长的 max_length
 3. 考虑使用 span-level 方法
@@ -507,12 +513,12 @@ print("<DEL> token ID:", tokenizer.convert_tokens_to_ids(["<DEL>"])[0])
 def batch_predict(predictor, queries, batch_size=16):
     """批量预测"""
     results = []
-    
+
     for i in range(0, len(queries), batch_size):
         batch_queries = queries[i:i+batch_size]
         batch_results = predictor.batch_predict(batch_queries)
         results.extend(batch_results)
-    
+
     return results
 ```
 
@@ -543,24 +549,26 @@ if confidence < 0.7:
 ### align_with_insert 方式的优势
 
 ✅ **优点**:
+
 1. 直观易懂，符合人类直觉
 2. 将不等长序列转化为等长序列
 3. 可以同时处理插入、删除、替换
 4. 模型架构无需修改
 
 ❌ **缺点**:
+
 1. 需要扩展词表（添加特殊标记）
 2. 推理时可能需要多轮迭代
 3. 连续插入较多时效果下降
 
 ### 适用场景
 
-| 场景特征 | 推荐使用 |
-|---------|---------|
-| 少量插入（1-2 个词） | ✅ 非常适合 |
-| 主要是替换操作 | ✅ 适合 |
-| 大量连续插入 | ⚠️ 考虑 span-level |
-| 实时性要求高 | ✅ 适合（单次前向传播） |
+| 场景特征         | 推荐使用             |
+| ------------ | ---------------- |
+| 少量插入（1-2 个词） | ✅ 非常适合           |
+| 主要是替换操作      | ✅ 适合             |
+| 大量连续插入       | ⚠️ 考虑 span-level |
+| 实时性要求高       | ✅ 适合（单次前向传播）     |
 
 ---
 
@@ -583,6 +591,7 @@ python test_prediction.py \
 ```
 
 **预期输出**:
+
 ```
 原句：vpn 到期 -> 改写：vpn 续费申请 (置信度：0.9234)
 原句：电脑登录不了 -> 改写：电脑无法登录 (置信度：0.8956)

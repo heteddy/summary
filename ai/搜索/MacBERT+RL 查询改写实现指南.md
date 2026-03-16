@@ -28,13 +28,13 @@ class MacBERTForRLQueryRewrite:
 def forward(self, input_ids, attention_mask, labels):
     sequence_output = self.bert(input_ids, attention_mask)
     logits = self.classifier(sequence_output)
-    
+
     if labels is not None:
         loss_fct = nn.CrossEntropyLoss(ignore_index=-100)
         logits_flat = logits.view(-1, vocab_size)
         labels_flat = labels.view(-1)
         loss = loss_fct(logits_flat, labels_flat)
-    
+
     return loss, logits
 ```
 
@@ -61,6 +61,7 @@ policy_loss = -torch.min(surr1, surr2)
 $$L^{CLIP}(\theta) = \mathbb{E}[\min(r_t(\theta) \cdot A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \cdot A_t)]$$
 
 其中：
+
 - $r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{old}}(a_t|s_t)}$ 是重要性采样比率
 - $A_t$ 是优势函数
 - $\epsilon$ 是 clip 参数（默认 0.2）
@@ -95,6 +96,7 @@ loss = policy_loss.mean() + value_coef * value_loss - entropy_coef * entropy_los
 $$L^{TOTAL} = L^{CLIP} + c_1 \cdot L^{VF} - c_2 \cdot H$$
 
 其中：
+
 - $c_1 = 0.5$ （价值系数）
 - $c_2 = 0.01$ （熵系数）
 
@@ -106,16 +108,16 @@ $$L^{TOTAL} = L^{CLIP} + c_1 \cdot L^{VF} - c_2 \cdot H$$
 def calculate_reward(self, original_query, rewritten_query, target_query):
     # 1. 语义相似度奖励（权重 0.4）
     semantic_reward = self.semantic_similarity_reward(...)
-    
+
     # 2. 长度合理性奖励（权重 0.2）
     length_reward = self.length_reward(...)
-    
+
     # 3. 流畅度奖励（权重 0.2）
     fluency_reward = self.fluency_reward(...)
-    
+
     # 4. 目标相似度奖励（权重 0.2）
     target_reward = self.target_similarity_reward(...)
-    
+
     # 加权求和
     total_reward = 0.4*semantic + 0.2*length + 0.2*fluency + 0.2*target
 ```
@@ -130,22 +132,23 @@ $$R = 0.4 \cdot R_{semantic} + 0.2 \cdot R_{length} + 0.2 \cdot R_{fluency} + 0.
 ```python
 def compute_returns_and_advantages(self, rewards, values, dones):
     last_gae_lambda = 0
-    
+
     for t in reversed(range(seq_len)):
         # TD error: δ_t = r_t + γV(s_{t+1}) - V(s_t)
         delta = rewards[t] + gamma * next_value * (1-dones[t]) - values[t]
-        
+
         # GAE: A_t = δ_t + γλδ_{t+1} + ...
         last_gae_lambda = delta + gamma * lambda_ * (1-dones[t]) * last_gae_lambda
         advantages[t] = last_gae_lambda
-    
+
     return returns, advantages
 ```
 
 **GAE 公式**：
-$$A_t^{GAE(\gamma,\lambda)} = \sum_{l=0}^{\infty} (\gamma\lambda)^l \delta_{t+l}$$
+$A_t^{GAE(\gamma,\lambda)} = \sum_{l=0}^{\infty} (\gamma\lambda)^l \delta_{t+l}$
 
 其中：
+
 - $\gamma = 0.99$ （折扣因子）
 - $\lambda = 0.95$ （GAE 平滑参数）
 - $\delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)$ （TD error）
@@ -183,24 +186,24 @@ rl_trainer = PPOTrainer(model, reward_fn, args)
 for epoch in range(rl_epochs):
     # 1. 采样动作
     actions, log_probs, values = model.sample_actions(input_ids)
-    
+
     # 2. 计算奖励
     rewards = [reward_fn(original, rewritten) for ...]
-    
+
     # 3. 计算优势
     returns, advantages = compute_returns_and_advantages(rewards, values)
-    
+
     # 4. PPO 更新（多次）
     for _ in range(ppo_epochs):
         new_log_probs, new_values = model(input_ids, actions)
-        
+
         ratio = exp(new_log_probs - old_log_probs)
         policy_loss = -min(ratio * advantages, clip(ratio) * advantages)
         value_loss = MSE(new_values, returns)
         entropy_loss = entropy(policy_logits)
-        
+
         loss = policy_loss + 0.5 * value_loss - 0.01 * entropy_loss
-        
+
         loss.backward()
         optimizer.step()
 ```
@@ -212,7 +215,7 @@ for epoch in range(rl_epochs):
 for k = 0, 1, 2, ... do:
     采集 N 条轨迹 {(s_t, a_t, r_t)}
     计算优势函数 Â_t (使用 GAE)
-    
+
     for epoch = 1 to K do:
         对于每个样本：
             计算比率 r_t(θ) = π_θ(a_t|s_t) / π_θ_old(a_t|s_t)
@@ -220,9 +223,9 @@ for k = 0, 1, 2, ... do:
             计算价值损失 L^VF(ϕ)
             计算熵正则 H(π)
             总损失 L = L^CLIP + c1*L^VF - c2*H
-        
+
         更新 θ 和 ϕ (使用梯度下降)
-    
+
     更新旧策略 π_θ_old ← π_θ
 ```
 
@@ -233,13 +236,13 @@ class Args:
     # 第一阶段
     sl_learning_rate = 5e-5      # 监督学习学习率
     sl_epochs = 10               # 监督学习轮数
-    
+
     # 第二阶段
     policy_lr = 3e-5             # 策略头学习率
     value_lr = 1e-4              # 价值头学习率
     bert_lr = 1e-5               # BERT 编码器学习率
     rl_epochs = 5                # RL 训练轮数
-    
+
     # PPO 参数
     clip_epsilon = 0.2           # PPO clip 范围
     gamma = 0.99                 # 折扣因子
@@ -273,13 +276,13 @@ rewritten_query = tokenizer.decode(actions[0])
 
 ## 与纯监督学习的区别
 
-| 特性 | 监督学习 | 强化学习 |
-|------|---------|---------|
-| **目标** | 拟合标注数据 | 最大化累积奖励 |
-| **损失** | 交叉熵 | PPO 损失（策略 + 价值 + 熵） |
-| **数据** | 需要 (original, target) 对 | 只需要 original 和 reward |
-| **灵活性** | 受限于标注 | 可定义任意 reward 函数 |
-| **优化** | 逐 token 准确 | 序列级别整体优化 |
+| 特性      | 监督学习                    | 强化学习                  |
+| ------- | ----------------------- | --------------------- |
+| **目标**  | 拟合标注数据                  | 最大化累积奖励               |
+| **损失**  | 交叉熵                     | PPO 损失（策略 + 价值 + 熵）   |
+| **数据**  | 需要 (original, target) 对 | 只需要 original 和 reward |
+| **灵活性** | 受限于标注                   | 可定义任意 reward 函数       |
+| **优化**  | 逐 token 准确              | 序列级别整体优化              |
 
 ## 总结
 
@@ -292,6 +295,7 @@ rewritten_query = tokenizer.decode(actions[0])
 5. **探索**：通过熵正则保持探索能力
 
 这种设计使得模型能够：
+
 - ✅ 超越标注数据的限制
 - ✅ 直接优化业务指标（通过 reward 设计）
 - ✅ 更稳定的训练过程（PPO 的 clipped 更新）

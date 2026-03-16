@@ -7,11 +7,13 @@
 ## 核心原理
 
 ### 方法特点
+
 - **模型架构**: 使用 MacBERT（encoder-only）作为基础模型
 - **任务转化**: 将 query改写转化为序列标注任务
 - **预测方式**: 对输入序列的每个位置进行词表级别的分类，选择概率最高的词作为改写结果
 
 ### 技术优势
+
 1. ✅ 利用 MacBERT强大的中文语义理解能力
 2. ✅ 双向上下文建模，充分利用语境信息
 3. ✅ 训练效率高，可直接使用交叉熵损失
@@ -135,28 +137,36 @@ print(f"置信度：{confidence:.4f}")
 ### 核心组件
 
 #### 1. QueryRewriteDataBuilder - 数据构建器
+
 负责将原始查询和目标查询转换为训练所需的格式：
+
 - 分词
 - 序列对齐（使用编辑距离算法）
 - 构建 labels
 
 #### 2. QueryRewriteDataset - 数据集类
+
 PyTorch Dataset，用于加载和处理训练数据。
 
 #### 3. MacBERTForQueryRewrite - 模型类
+
 基于 MacBERT的查询改写模型：
+
 - 使用 BertModel 作为编码器
 - 添加线性分类层进行词表预测
 - 支持训练和推理两种模式
 
 #### 4. Trainer - 训练器
+
 封装完整的训练流程：
+
 - 自动管理训练循环
 - 验证和评估
 - 学习率调度
 - 最佳模型保存
 
 #### 5. Predictor - 预测器
+
 简化的推理接口，用于生产环境部署。
 
 ## 关键技术点
@@ -201,12 +211,12 @@ loss = loss_fct(logits_flat, labels_flat)
 
 ### 超参数推荐
 
-| 参数 | 小数据集 (<1k) | 中等数据集 (1k-10k) | 大数据集 (>10k) |
-|------|---------------|-------------------|----------------|
-| batch_size | 8-16 | 16-32 | 32-64 |
-| learning_rate | 3e-5 | 2e-5 - 3e-5 | 1e-5 - 2e-5 |
-| epochs | 20-30 | 10-20 | 5-10 |
-| max_length | 64-128 | 128 | 128-256 |
+| 参数            | 小数据集 (<1k) | 中等数据集 (1k-10k) | 大数据集 (>10k) |
+| ------------- | ---------- | -------------- | ----------- |
+| batch_size    | 8-16       | 16-32          | 32-64       |
+| learning_rate | 3e-5       | 2e-5 - 3e-5    | 1e-5 - 2e-5 |
+| epochs        | 20-30      | 10-20          | 5-10        |
+| max_length    | 64-128     | 128            | 128-256     |
 
 ### 数据增强策略
 
@@ -217,26 +227,33 @@ loss = loss_fct(logits_flat, labels_flat)
 ### 常见问题解决
 
 #### Q1: 训练损失下降但验证损失上升
+
 **原因**: 过拟合  
 **解决方案**:
+
 - 减少 epochs
 - 增加 dropout
 - 使用早停策略（early stopping）
 - 增加训练数据
 
 #### Q2: 改写结果质量不高
+
 **可能原因**:
+
 - 训练数据不足
 - 对齐策略不合理
 - 模型容量不够
 
 **改进方案**:
+
 - 收集更多高质量的配对数据
 - 优化序列对齐算法
 - 尝试更大的模型（如 macbert-large）
 
 #### Q3: 推理速度较慢
+
 **优化方案**:
+
 - 使用 GPU 推理
 - 减小 max_length
 - 批量推理（batch prediction）
@@ -250,24 +267,24 @@ loss = loss_fct(logits_flat, labels_flat)
 def evaluate_rewriting(original, predicted, reference):
     """
     评估改写质量
-    
+
     Args:
         original: 原始查询
         predicted: 模型改写的查询
         reference: 人工标注的标准改写
-    
+
     Returns:
         metrics: 评估指标字典
     """
     from nltk.translate.bleu_score import sentence_bleu
-    
+
     # BLEU分数
     bleu = sentence_bleu([reference.split()], predicted.split())
-    
+
     # 编辑距离
     from Levenshtein import distance
     edit_dist = distance(predicted, reference)
-    
+
     return {
         "bleu": bleu,
         "edit_distance": edit_dist
@@ -297,6 +314,7 @@ def evaluate_rewriting(original, predicted, reference):
 ### 3. 多任务学习
 
 同时训练多个相关任务：
+
 - Query改写
 - Query 分类
 - 语义匹配

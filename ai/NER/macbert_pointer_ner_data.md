@@ -7,12 +7,15 @@
 ### 实体类型定义
 
 1. **公司 (ORGANIZATION)**: 企业、子公司、集团名称
+   
    - 示例：阿里巴巴、腾讯科技、华为技术有限公司
-   
+
 2. **部门 (DEPARTMENT)**: 内部组织机构
-   - 示例：技术部、人力资源部、财务部、研发中心
    
+   - 示例：技术部、人力资源部、财务部、研发中心
+
 3. **岗位 (POSITION)**: 职位、头衔
+   
    - 示例：软件工程师、产品经理、总监、经理
 
 ---
@@ -48,6 +51,7 @@
 ```
 
 **字段说明**:
+
 - `text`: 原始文本
 - `entities`: 实体列表
   - `type`: 实体类型 (ORGANIZATION/DEPARTMENT/POSITION)
@@ -60,6 +64,7 @@
 ## 训练数据示例
 
 ### 示例 1: 简单实体
+
 ```json
 {
   "text": "李四在腾讯科技研发中心工作",
@@ -81,6 +86,7 @@
 ```
 
 ### 示例 2: 嵌套实体
+
 ```json
 {
   "text": "华为技术有限公司云计算部门首席架构师王五",
@@ -108,6 +114,7 @@
 ```
 
 ### 示例 3: 多实体
+
 ```json
 {
   "text": "张三和李四分别在百度市场部和字节跳动产品部任职",
@@ -141,6 +148,7 @@
 ```
 
 ### 示例 4: 复杂场景
+
 ```json
 {
   "text": "2023 年，京东集团人力资源副总裁赵六在北京总部接待了阿里巴巴菜鸟网络物流事业部总经理",
@@ -949,6 +957,7 @@
 ### 方法 1: 直接位置索引法
 
 对于每个实体类型，构建两个标签:
+
 - `start_labels`: 实体起始位置的 one-hot 编码
 - `end_labels`: 实体结束位置的 one-hot 编码
 
@@ -957,12 +966,12 @@
 def build_pointer_labels(text, entities, max_length):
     """
     构建指针网络的训练标签
-    
+
     Args:
         text: 输入文本
         entities: 实体列表
         max_length: 最大序列长度
-    
+
     Returns:
         start_labels: dict, 每个实体类型的起始位置标签
         end_labels: dict, 每个实体类型的结束位置标签
@@ -977,17 +986,17 @@ def build_pointer_labels(text, entities, max_length):
         'DEPARTMENT': [0] * max_length,
         'POSITION': [0] * max_length
     }
-    
+
     for entity in entities:
         entity_type = entity['type']
         start_pos = entity['start']
         end_pos = entity['end'] - 1  # 转换为包含结束位置
-        
+
         if start_pos < max_length:
             start_labels[entity_type][start_pos] = 1
         if end_pos < max_length:
             end_labels[entity_type][end_pos] = 1
-    
+
     return start_labels, end_labels
 ```
 
@@ -1003,7 +1012,7 @@ def tokenize_with_special_tokens(text, tokenizer):
     tokens = tokenizer.tokenize(text)
     # 添加 [CLS] 和 [SEP]
     tokens = ['[CLS]'] + tokens + ['[SEP]']
-    
+
     # 调整实体位置 (都 +1，因为前面加了 [CLS])
     return tokens
 ```
@@ -1018,7 +1027,7 @@ class PointerNetworkLoss(nn.Module):
     def __init__(self):
         super().__init__()
         self.criterion = nn.CrossEntropyLoss()
-    
+
     def forward(self, start_logits, end_logits, start_labels, end_labels):
         """
         Args:
@@ -1026,13 +1035,13 @@ class PointerNetworkLoss(nn.Module):
             end_logits: (batch_size, seq_len) - 预测的结束位置 logits
             start_labels: (batch_size,) - 真实的起始位置索引
             end_labels: (batch_size,) - 真实的结束位置索引
-        
+
         Returns:
             loss: 总损失
         """
         start_loss = self.criterion(start_logits, start_labels)
         end_loss = self.criterion(end_logits, end_labels)
-        
+
         return start_loss + end_loss
 ```
 
@@ -1083,20 +1092,20 @@ def predict_entities(model, tokenizer, text, threshold=0.5):
     """
     # 1. 分词
     inputs = tokenizer(text, return_tensors='pt', truncation=True, max_length=128)
-    
+
     # 2. 模型推理
     with torch.no_grad():
         start_logits, end_logits = model(**inputs)
         start_probs = torch.softmax(start_logits, dim=-1)
         end_probs = torch.softmax(end_logits, dim=-1)
-    
+
     # 3. 提取实体
     entities = []
     for entity_type in ['ORGANIZATION', 'DEPARTMENT', 'POSITION']:
         # 找到概率最高的 start 和 end 位置
         start_idx = torch.argmax(start_probs[0, :, entity_type_map[entity_type]])
         end_idx = torch.argmax(end_probs[0, :, entity_type_map[entity_type]])
-        
+
         if start_probs[0, start_idx, entity_type_map[entity_type]] > threshold:
             # 解码实体文本
             entity_text = tokenizer.decode(inputs['input_ids'][0][start_idx:end_idx+1])
@@ -1106,7 +1115,7 @@ def predict_entities(model, tokenizer, text, threshold=0.5):
                 'end': end_idx.item() + 1,
                 'text': entity_text
             })
-    
+
     return entities
 ```
 
