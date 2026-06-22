@@ -165,7 +165,7 @@ Agent 接收到用户消息后，并不会直接转发，而是会封装上下�
 
 ### 2.1  agent->llm
 
-<b><span style="color:rgba(244,63,94,1)">注意：以为是发送如下请求：</span></b>
+<b><span style="color:rgba(244,63,94,1)"><mark>注意：以为是发送如下请求：</mark></span></b>
 
 ```json
 {
@@ -217,7 +217,7 @@ Agent 接收到用户消息后，并不会直接转发，而是会封装上下�
 }
 ```
 
-<b><span style="color:rgba(244,63,94,1)">实际发送的请求为 </span></b>
+<b><span style="color:rgba(244,63,94,1)"><mark>实际发送的请求为 </mark></span></b>
 
 这里体现了分层的思想
 
@@ -238,8 +238,6 @@ Agent 接收到用户消息后，并不会直接转发，而是会封装上下�
   ]
 }
 ```
-
-
 
 ### 2.2 LLM返回给 Agent (Response JSON)
 
@@ -430,8 +428,6 @@ todo
 
 你可以看到，最后一步模型同时输出了两个 write_file。这是因为 Skill 指南里写了“必须同步创建模板文件”，模型被技能逻辑约束，实现了复杂任务的同步处理。
 
-
-
 ### 进阶：如何防止 AI “乱选”？
 
 在 `definition.json` 中为每个技能添加 **"Trigger Examples" (触发示例)**：
@@ -513,4 +509,3 @@ todo
     ]
 }
 ```
-

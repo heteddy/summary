@@ -89,7 +89,7 @@ Agent Skills 最核心的创新是**渐进式披露（Progressive Disclosure）�
 
 例如，一个 PDF 处理技能的文件结构可能是：
 
-````
+```
 skills/pdf-processing/
 ├── SKILL.md              # 主技能文件
 ├── parse_pdf.py          # PDF 解析脚本
@@ -97,7 +97,7 @@ skills/pdf-processing/
 └── templates/            # PDF 模板文件
     ├── invoice.pdf
     └── report.pdf
-````
+```
 
 在 `SKILL.md` 中，可以这样引用附加资源：
 
@@ -169,7 +169,7 @@ name: code-review-workflowdescription: 执行标准的代码审查流程，包�
 5. **提供反馈**：
    - 严重问题：使用 `create_pr_comment` 直接评论
    - 建议改进：在总结中提出
-  
+
 ## 公司特定规范
 - 所有数据库查询必须使用参数化查询
 - API 端点必须有权限验证装饰器
@@ -195,8 +195,6 @@ Skills 告诉智能体"应该"做什么、如何组织审查流程、需要关�
 <iframe src="https://image.jido.dev/20251223003954_b0dbecde"/>
 
 图 4 Skills + MCP 混合架构设计
-
-
 
 **典型工作流**：
 
@@ -450,10 +448,6 @@ Agent Skills 和 MCP 代表了智能体技术栈中两个关键的抽象层：
 窄屏模式
 
 # 别再造 Agent 了！关于 Agent Skills 的详细总结来了
-
-
-
-
 
 # 参考资料
 
